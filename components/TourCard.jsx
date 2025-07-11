@@ -10,6 +10,7 @@ export default function TourCard({ tour }) {
         width={400}
         height={300}
         className="w-full h-60 object-cover"
+        style={{ objectPosition: "center top" }}
       />
       <div className="p-4">
         <h2 className="text-xl font-bold text-tertiary">{tour.name}</h2>
