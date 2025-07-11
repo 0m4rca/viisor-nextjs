@@ -13,7 +13,7 @@ export default function TourCard({ tour }) {
       />
       <div className="p-4">
         <h2 className="text-xl font-bold text-tertiary">{tour.name}</h2>
-        <p className="text-gray-600">{tour.description}</p>
+        <p className="text-gray-600">{tour.short_description}</p>
         <p className="mt-2 text-lg font-semibold text-primary">${tour.price}</p>
         <Link
           href={`/booking/${tour.id}`}
