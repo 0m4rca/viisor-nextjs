@@ -8,8 +8,8 @@ export default function Logo() {
       <Image
         src="/viisor-small.png"
         alt="Logo small"
-        width={96} // 16 * 4 = 64px
-        height={96}
+        width={64}
+        height={64}
         className="block top-4 left-6  md:hidden"
       />
       {/* Big logo - hidden on small screens, visible md and up */}

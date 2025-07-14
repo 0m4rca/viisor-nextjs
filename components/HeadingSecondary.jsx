@@ -4,7 +4,7 @@ export default function HeadingSecondary({ children }) {
       className="
     heading-secondary
     bg-gradient-to-r-primary
-    text-[3.5rem]
+    text-xl
     uppercase
     font-bold
     block
@@ -15,8 +15,8 @@ export default function HeadingSecondary({ children }) {
     transition-transform
     duration-300
     ease-in-out
-    md:text-[3.25rem]
-    sm:text-[3rem]
+    md:text-4xl
+    py-4
       "
     >
       {children}
