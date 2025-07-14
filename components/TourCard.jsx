@@ -17,7 +17,7 @@ export default function TourCard({ tour }) {
         <p className="text-gray-600">{tour.short_description}</p>
         <p className="mt-2 text-lg font-semibold text-primary">${tour.price}</p>
         <Link
-          href={`/booking/${tour.id}`}
+          href={`/booking/${tour.slug}`}
           className="inline-block mt-3 text-white bg-primary px-4 py-2 rounded-xl hover:bg-opacity-80"
         >
           Book Now

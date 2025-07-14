@@ -1,4 +1,4 @@
-"use client"; // only if you're using the App Router
+"use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
