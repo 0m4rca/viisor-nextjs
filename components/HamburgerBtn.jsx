@@ -9,7 +9,7 @@ export default function HamburgerBtn() {
       <button
         aria-label="Toggle menu"
         aria-expanded={open}
-        className="fixed top-4 right-6 z-[2000] w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center cursor-pointer"
+        className="fixed top-8 right-6 md:top-20 md:right-24 z-[2000] w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center cursor-pointer"
         onClick={() => setOpen((prev) => !prev)}
       >
         <div className="relative w-8 h-6">
@@ -35,7 +35,7 @@ export default function HamburgerBtn() {
       </button>
       {/* Expanding Circle Background */}
       <div
-        className={`fixed top-6 right-6 w-16 h-16 bg-gradient-to-br from-primary to-tertiary rounded-full z-[1000] transition-transform duration-[800ms] ease-in-out ${
+        className={`fixed top-8 right-6 md:top-20 md:right-24 w-24 h-24 bg-gradient-to-br from-primary to-tertiary rounded-full z-[1000] transition-transform duration-[800ms] ease-in-out ${
           open ? "scale-[80]" : "scale-0"
         }`}
       ></div>

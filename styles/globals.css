@@ -1,0 +1,89 @@
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset básico */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+  /* Escala de fuente para 1rem = 10px */
+  font-size: 62.5%;
+}
+
+@media (max-width: 1200px) {
+  html {
+    font-size: 56.25%; /* 1rem = 9px */
+  }
+}
+
+@media (max-width: 900px) {
+  html {
+    font-size: 50%; /* 1rem = 8px */
+  }
+}
+
+@media (min-width: 900px) {
+  body {
+    padding: 3rem;
+  }
+}
+
+@media (min-width: 1800px) {
+  html {
+    font-size: 75%; /* 1rem = 12px */
+  }
+}
+
+/* Variables CSS */
+:root {
+  --color-primary: #3ac9a8;
+  --color-primary-light: #6fe0c4;
+  --color-primary-dark: #2fa68c;
+  --color-secondary: #f1faf5;
+  --color-tertiary: #145c58;
+}
+
+/* Estilo hover para títulos secundarios */
+.heading-secondary:hover {
+  background-image: linear-gradient(
+    to left,
+    var(--color-primary-light),
+    var(--color-primary-dark)
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  transform: scale(1.009) rotate(-1.5deg);
+  text-shadow: 0.5rem 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+/* Animaciones personalizadas */
+@keyframes moveInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes moveInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

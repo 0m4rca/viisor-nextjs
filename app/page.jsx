@@ -1,13 +1,14 @@
-import Link from "next/link";
 import TourList from "../components/TourList";
 import Header from "../components/Header";
+import HeadingSecondary from "../components/HeadingSecondary";
+import "../styles/globals.css";
 
 export default function HomePage() {
   return (
     <div>
       <Header />
-      <main className="p-6">
-        <h2 className="text-2xl font-semibold mb-4">Explore Our Tours</h2>
+      <main className="p-6 ">
+        <HeadingSecondary>Explore our tours</HeadingSecondary>
         <TourList />
       </main>
       <footer className="bg-primary text-white p-6 text-center">
