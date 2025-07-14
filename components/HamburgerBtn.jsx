@@ -9,7 +9,12 @@ export default function HamburgerBtn() {
       <button
         aria-label="Toggle menu"
         aria-expanded={open}
-        className="fixed top-8 right-6 md:top-20 md:right-24 z-[2000] w-24 h-24 rounded-full bg-white shadow-lg flex items-center justify-center cursor-pointer"
+        className="fixed 
+        top-4 right-6 md:top-16 md:right-24 
+        z-[2000] 
+        w-24 h-24 
+        rounded-full bg-white shadow-lg 
+        flex items-center justify-center cursor-pointer"
         onClick={() => setOpen((prev) => !prev)}
       >
         <div className="relative w-8 h-6">

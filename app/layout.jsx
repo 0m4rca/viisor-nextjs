@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${montserrat.variable} font-sans bg-secondary text-tertiary`}
+        className={`md:px-8 md:py-6 lg:px-16 lg:py-10 ${montserrat.variable} font-sans bg-secondary text-tertiary`}
       >
         {children}
       </body>
