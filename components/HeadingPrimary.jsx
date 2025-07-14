@@ -1,16 +1,16 @@
 export default function HeadingPrimary({ main, sub }) {
   return (
-    <div className="heading-primary text-white uppercase mb-0">
+    <div className="heading-primary py-6 text-white uppercase mb-0">
       <span
         className="
           block
-          text-[3rem]
+          text-2xl
+          md:text-4xl
           font-light
-          tracking-[0.15em]
+          tracking-[.16em]
+          md:tracking-[.125em]
           leading-tight
           animate-moveInLeft
-          sm:text-[3.5rem]
-          md:text-[4rem]
         "
         style={{ animationDuration: "1s", animationTimingFunction: "ease-out" }}
       >
@@ -19,13 +19,13 @@ export default function HeadingPrimary({ main, sub }) {
       <span
         className="
           block
-          text-[1.75rem]
+          text-l
+          md:text-xl
           font-bold
-          tracking-[0.1em]
+          tracking-normal
+          md:tracking-widest
           leading-tight
           animate-moveInRight
-          sm:text-[2rem]
-          md:text-[2.25rem]
         "
         style={{ animationDuration: "1s", animationTimingFunction: "ease-out" }}
       >

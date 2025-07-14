@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import Navigation from "./Navigation";
 import HeadingPrimary from "./HeadingPrimary";
+import ButtonText from "./ButtonText";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -26,12 +26,7 @@ export default function Header() {
           main="Dive with VIISOR"
           sub="Witness Baja California Sur"
         />
-        <Link
-          href="/booking"
-          className="bg-primary hover:bg-opacity-90 text-white text-lg font-medium px-6 py-3 rounded-full transition"
-        >
-          Book Now
-        </Link>
+        <ButtonText href="/booking">Book Now</ButtonText>
       </div>
 
       <Navigation />
