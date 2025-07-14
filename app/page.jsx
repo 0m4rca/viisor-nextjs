@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div>
       <Header />
-      <main className="p-6 ">
+      <main>
         <HeadingSecondary>Explore our tours</HeadingSecondary>
         <TourList />
       </main>

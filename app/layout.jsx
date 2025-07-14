@@ -1,6 +1,7 @@
 import "./globals.css";
 import { Montserrat } from "next/font/google";
 import "../styles/globals.css";
+import Navigation from "../components/Navigation";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -19,7 +20,10 @@ export default function RootLayout({ children }) {
       <body
         className={`md:px-8 md:py-6 lg:px-16 lg:py-10 ${montserrat.variable} font-sans bg-secondary text-tertiary`}
       >
-        {children}
+        <div className="relative">
+          <Navigation />
+        </div>
+        <main>{children}</main>
       </body>
     </html>
   );

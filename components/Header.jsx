@@ -26,10 +26,14 @@ export default function Header() {
           main="Dive with VIISOR"
           sub="Witness Baja California Sur"
         />
-        <ButtonText href="/booking">Book Now</ButtonText>
+        <ButtonText
+          href="/Tours"
+          className=" bg-[var(--color-secondary)] text-gray-700
+        "
+        >
+          Discover our tours
+        </ButtonText>
       </div>
-
-      <Navigation />
     </header>
   );
 }
