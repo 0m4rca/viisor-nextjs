@@ -1,5 +1,4 @@
 import ButtonText from "./ButtonText";
-import Link from "next/link";
 
 export default function FlipCard({ tour }) {
   return (

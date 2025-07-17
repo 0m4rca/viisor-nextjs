@@ -10,8 +10,18 @@ module.exports = {
         primary: "var(--color-primary)",
         "primary-light": "var(--color-primary-light)",
         "primary-dark": "var(--color-primary-dark)",
-        secondary: "var(--color-secondary)",
-        tertiary: "var(--color-tertiary)",
+
+        "secondary-light": "var(--color-secondary-light)",
+        "secondary-dark": "var(--color-secondary-dark)",
+
+        "tertiary-light": "var(--color-tertiary-light)",
+        "tertiary-dark": "var(--color-tertiary-dark)",
+
+        "grey-light-1": "var(--color-grey-light-1)",
+        "grey-light-2": "var(--color-grey-light-2)",
+        "grey-dark": "var(--color-grey-dark)",
+        "grey-dark-2": "var(--color-grey-dark-2)",
+        "grey-dark-3": "var(--color-grey-dark-3)",
       },
       animation: {
         moveInLeft: "moveInLeft 1s ease-out forwards",

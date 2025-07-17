@@ -52,7 +52,7 @@ export default function HamburgerBtn() {
       </button>
       {/* Expanding Circle Background */}
       <div
-        className={`fixed top-8 right-6 md:top-20 md:right-24 w-24 h-24 bg-gradient-to-br from-primary to-tertiary rounded-full z-[1000] transition-transform duration-[800ms] ease-in-out ${
+        className={`fixed top-8 right-6 md:top-20 md:right-24 w-24 h-24 bg-gradient-to-br from-primary-dark to-tertiary-dark rounded-full z-[1000] transition-transform duration-[800ms] ease-in-out ${
           open ? "scale-[80]" : "scale-0"
         }`}
       ></div>
