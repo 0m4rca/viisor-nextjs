@@ -13,7 +13,7 @@ export default function Header() {
       <div className="relative h-screen w-full overflow-hidden">
         {/* Imagen móvil */}
         <Image
-          src="/cover-mobile.jpg"
+          src="/cover-mobile.JPG"
           alt="Scuba Diving Adventure"
           fill
           priority
@@ -22,7 +22,7 @@ export default function Header() {
 
         {/* Imagen desktop */}
         <Image
-          src="/cover-desktop.jpg"
+          src="/cover-desktop.JPG"
           alt="Scuba Diving Adventure"
           fill
           priority
