@@ -34,7 +34,7 @@ export default function TourList() {
   if (loading) return <p>Loading tours...</p>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 justify-items-center py-4">
       {tours.map((tour) => (
         <TourCard key={tour.id} tour={tour} />
       ))}

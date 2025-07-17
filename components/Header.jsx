@@ -28,7 +28,7 @@ export default function Header() {
         />
         <ButtonText
           href="/Tours"
-          className=" bg-[var(--color-secondary)] text-gray-700
+          className=" bg-[var(--color-secondary-dark)] text-gray-700
         "
         >
           Discover our tours

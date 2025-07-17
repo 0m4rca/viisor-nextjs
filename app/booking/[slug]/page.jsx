@@ -50,11 +50,7 @@ export default async function BookingPage({ params }) {
             {tour.name}
           </h1>
 
-          <p className="text-gray-700 mb-6 text-center max-w-xl mx-auto">
-            {tour.short_description}
-          </p>
-
-          <p className="text-gray-800 leading-relaxed mb-8">
+          <p className="text-gray-800 leading-relaxed mb-8 text-justify">
             {tour.long_description}
           </p>
 
@@ -62,7 +58,7 @@ export default async function BookingPage({ params }) {
             <p className="text-2xl font-semibold text-primary">${tour.price}</p>
 
             <button className="bg-primary text-white font-semibold px-6 py-3 rounded-xl hover:bg-opacity-90 transition">
-              Reservar ahora
+              book now
             </button>
           </div>
         </div>

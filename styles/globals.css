@@ -5,11 +5,25 @@
 
 /* Variables CSS */
 :root {
+  /* Primary Colors */
   --color-primary: #3ac9a8;
   --color-primary-light: #6fe0c4;
   --color-primary-dark: #2fa68c;
-  --color-secondary: #f1faf5;
-  --color-tertiary: #145c58;
+
+  /* Secondary Colors */
+  --color-secondary-light: #f1faf5;
+  --color-secondary-dark: #f1faf5; /* Same as light unless you want a darker version */
+
+  /* Tertiary Colors */
+  --color-tertiary-light: #145c58;
+  --color-tertiary-dark: #145c58; /* Same as light unless updated */
+
+  /* Greys */
+  --color-grey-light-1: #f7f7f7;
+  --color-grey-light-2: #eee;
+  --color-grey-dark: #777;
+  --color-grey-dark-2: #999;
+  --color-grey-dark-3: #333;
 }
 
 /* Estilo hover para títulos secundarios */

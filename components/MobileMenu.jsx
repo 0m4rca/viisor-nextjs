@@ -8,10 +8,10 @@ export default function MobileMenu({ open, setOpen }) {
       }`}
     >
       <ul className="flex flex-col items-center space-y-8 text-white text-2xl font-light uppercase ">
-        {["Home", "Tours", "Booking", "Contact"].map((label) => (
+        {["Home", "Tours", "Contact"].map((label) => (
           <li key={label}>
             <Link
-              href={`/${label === "Home" ? "" : label.toLowerCase()}`}
+              href={`/${label === "Home" ? "" : label}`}
               onClick={() => setOpen(false)}
               className="group relative px-8 py-4 overflow-hidden transition-all duration-500 ease-in-out"
             >
