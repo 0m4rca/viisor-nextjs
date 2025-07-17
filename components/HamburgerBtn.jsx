@@ -15,12 +15,12 @@ export default function HamburgerBtn() {
         right-4 
         md:top-20
         md:right-24 
-        z-[2000] 
         w-16 
         h-16 
         md:w-20 
         md:h-20 
         rounded-full 
+        z-[2000] 
         bg-white 
         shadow-lg 
         flex 
@@ -52,9 +52,22 @@ export default function HamburgerBtn() {
       </button>
       {/* Expanding Circle Background */}
       <div
-        className={`fixed top-8 right-6 md:top-20 md:right-24 w-24 h-24 bg-gradient-to-br from-primary-dark to-tertiary-dark rounded-full z-[1000] transition-transform duration-[800ms] ease-in-out ${
-          open ? "scale-[80]" : "scale-0"
-        }`}
+        className={`
+          fixed 
+          top-4 
+          right-4 
+          md:top-20 
+          md:right-24 
+          w-16 
+          h-16 
+          bg-gradient-to-br 
+          from-primary-dark 
+          to-tertiary-dark 
+          rounded-full 
+          z-[1000] 
+          transition-transform 
+          duration-[800ms] 
+          ease-in-out ${open ? "scale-[80]" : "scale-0"}`}
       ></div>
       <MobileMenu open={open} setOpen={setOpen} />
     </>
