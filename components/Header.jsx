@@ -16,7 +16,7 @@ export default function Header() {
           alt="Scuba Diving Adventure"
           fill
           priority
-          className="object-cover block md:hidden"
+          className="object-cover block lg:hidden"
         />
 
         {/* Imagen desktop */}
@@ -25,7 +25,7 @@ export default function Header() {
           alt="Scuba Diving Adventure"
           fill
           priority
-          className="object-cover hidden md:block object-[center_90%]"
+          className="object-cover hidden lg:block object-[center_90%]"
         />
       </div>
       {/* Overlay */}
@@ -41,19 +41,17 @@ export default function Header() {
       px-6 translate-y-20
       gap-2 md:gap-4"
       >
-        <div className="flex flex-col items-start items-center md:gap-8 gap-4">
-          <HeadingPrimary
-            main="Dive with VIISOR"
-            sub="Witness Baja California Sur"
-          />
-          <ButtonText
-            href="/Tours"
-            className=" bg-[var(--color-secondary-dark)] text-gray-700
+        <HeadingPrimary
+          main="Dive with VIISOR"
+          sub="Witness Baja California Sur"
+        />
+        <ButtonText
+          href="/Tours"
+          className=" bg-[var(--color-secondary-dark)] text-gray-700
         "
-          >
-            Discover our tours
-          </ButtonText>
-        </div>
+        >
+          Discover our tours
+        </ButtonText>
       </div>
     </header>
   );
