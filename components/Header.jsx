@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import Navigation from "./Navigation";
 import HeadingPrimary from "./HeadingPrimary";
 import ButtonText from "./ButtonText";
 
@@ -42,17 +41,19 @@ export default function Header() {
       px-6 translate-y-20
       gap-2 md:gap-4"
       >
-        <HeadingPrimary
-          main="Dive with VIISOR"
-          sub="Witness Baja California Sur"
-        />
-        <ButtonText
-          href="/Tours"
-          className=" bg-[var(--color-secondary-dark)] text-gray-700
+        <div className="flex flex-col items-start items-center md:gap-8 gap-4">
+          <HeadingPrimary
+            main="Dive with VIISOR"
+            sub="Witness Baja California Sur"
+          />
+          <ButtonText
+            href="/Tours"
+            className=" bg-[var(--color-secondary-dark)] text-gray-700
         "
-        >
-          Discover our tours
-        </ButtonText>
+          >
+            Discover our tours
+          </ButtonText>
+        </div>
       </div>
     </header>
   );

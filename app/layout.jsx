@@ -10,8 +10,53 @@ const montserrat = Montserrat({
 });
 
 export const metadata = {
-  title: "Omar's Diving Adventures",
-  description: "Book your next diving tour in La Paz!",
+  title: "VIISOR - Diving Tours in La Paz",
+  description:
+    "Book your next diving adventure in La Paz, Mexico with VIISOR! Certified and beginner-friendly tours available.",
+  icons: {
+    icon: "/viisor-small.png",
+    shortcut: "/viisor-small.png",
+    apple: "/viisor-small.png",
+  },
+  keywords: [
+    "scuba diving",
+    "La Paz",
+    "diving tours",
+    "Mexico",
+    "beginner diving",
+    "certified divers",
+    "diving courses",
+  ],
+  authors: [{ name: "VIISOR Diving", url: "https://viisordiving.com" }],
+  creator: "VIISOR Diving",
+  publisher: "VIISOR Diving",
+  robots: "index, follow",
+
+  openGraph: {
+    title: "VIISOR - Scuba Diving Tours in La Paz",
+    description:
+      "Explore the underwater world in La Paz with certified guides. Book your dive today!",
+    url: "https://viisordiving.com",
+    siteName: "VIISOR Diving",
+    images: [
+      {
+        url: "/og-image.jpg", // Puedes poner un logo o una imagen del mar o de buzos.
+        width: 1200,
+        height: 630,
+        alt: "VIISOR Diving Tours",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "VIISOR - Diving Tours in La Paz",
+    description:
+      "Book your next diving adventure in La Paz, Mexico with VIISOR.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({ children }) {
