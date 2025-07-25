@@ -28,6 +28,19 @@
   --color-tertiary-light-rgb: 20, 92, 88;
   --color-tertiary-dark-rgb: 20, 92, 88;
 
+  /* Nuevo: Gradientes reutilizables */
+  --gradient-overlay: linear-gradient(
+    to right bottom,
+    rgba(var(--color-secondary-dark-rgb), 0.5),
+    rgba(var(--color-tertiary-dark-rgb), 0.5)
+  );
+
+  --gradient-heading: linear-gradient(
+    to right bottom,
+    rgba(var(--color-primary-light-rgb), 0.9),
+    rgba(var(--color-primary-dark-rgb), 0.9)
+  );
+
   /* Greys */
   --color-grey-light-1: #f7f7f7;
   --color-grey-light-2: #eee;

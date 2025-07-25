@@ -10,7 +10,8 @@ export default function FlipCard({ tour }) {
           <div
             className="h-full w-full bg-cover bg-center"
             style={{
-              backgroundImage: `linear-gradient(to right bottom, rgba(var(--color-secondary-dark-rgb), 0.5), rgba(var(--color-tertiary-dark-rgb), 0.5)), url(${tour.imageUrl})`,
+              backgroundImage:
+                "var(--gradient-overlay), url(" + tour.imageUrl + ")",
             }}
           />
 
@@ -19,8 +20,7 @@ export default function FlipCard({ tour }) {
             <span
               className="box-decoration-break-clone px-1 py-1 rounded-md text-white"
               style={{
-                backgroundImage:
-                  "linear-gradient(to right bottom, rgba(var(--color-primary-light-rgb), 0.9), rgba(var(--color-primary-dark-rgb), 0.9))",
+                backgroundImage: "var(--gradient-heading)",
               }}
             >
               {tour.name}
@@ -64,11 +64,12 @@ export default function FlipCard({ tour }) {
   "
           >
             <div className="relative h-[13rem] w-full overflow-hidden">
-              {/* Imagen con degradado y clip-path */}
+              {/* Imagen con degradado */}
               <div
                 className="h-full w-full bg-cover bg-center"
                 style={{
-                  backgroundImage: `linear-gradient(to right bottom, rgba(var(--color-secondary-dark-rgb), 0.5), rgba(var(--color-tertiary-dark-rgb), 0.5)), url(${tour.imageUrl})`,
+                  backgroundImage:
+                    "var(--gradient-overlay), url(" + tour.imageUrl + ")",
                 }}
               />
 
@@ -77,8 +78,7 @@ export default function FlipCard({ tour }) {
                 <span
                   className="box-decoration-break-clone px-1 py-1 rounded-md text-white"
                   style={{
-                    backgroundImage:
-                      "linear-gradient(to right bottom, rgba(var(--color-primary-light-rgb), 0.9), rgba(var(--color-primary-dark-rgb), 0.9))",
+                    backgroundImage: "var(--gradient-heading)",
                   }}
                 >
                   {tour.name}
