@@ -3,7 +3,7 @@ import TourDetails from "./TourDetails";
 
 export default function FlipCard({ tour }) {
   return (
-    <div className="relative w-80 md:w-96 p-4 mx-auto group">
+    <div className="relative w-80 md:w-96 p-0 md:p-4 mx-auto group">
       {/* ✅ MOBILE: Show as a static simple card */}
       <div className="block md:hidden rounded-xl overflow-hidden shadow-xl bg-white text-center">
         <div className="relative h-48 w-full overflow-hidden">
