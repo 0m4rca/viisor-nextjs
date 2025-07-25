@@ -18,6 +18,16 @@
   --color-tertiary-light: #145c58;
   --color-tertiary-dark: #145c58; /* Same as light unless updated */
 
+  /*RGB*/
+  --color-primary-light-rgb: 111, 224, 196; /* #6fe0c4 */
+  --color-primary-dark-rgb: 47, 166, 140; /* #2fa68c */
+
+  --color-secondary-light-rgb: 241, 250, 245;
+  --color-secondary-dark-rgb: 241, 250, 245;
+
+  --color-tertiary-light-rgb: 20, 92, 88;
+  --color-tertiary-dark-rgb: 20, 92, 88;
+
   /* Greys */
   --color-grey-light-1: #f7f7f7;
   --color-grey-light-2: #eee;

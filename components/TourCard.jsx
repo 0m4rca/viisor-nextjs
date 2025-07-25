@@ -5,18 +5,41 @@ export default function FlipCard({ tour }) {
     <div className="relative w-80 mx-auto group">
       {/* ✅ MOBILE: Show as a static simple card */}
       <div className="block md:hidden rounded-xl overflow-hidden shadow-xl bg-white text-center">
-        <img
-          src={tour.imageUrl}
-          alt={tour.name}
-          className="w-full h-48 object-cover object-center"
-        />
+        <div className="relative h-48 w-full overflow-hidden">
+          {/* Imagen con degradado */}
+          <div
+            className="h-full w-full bg-cover bg-center"
+            style={{
+              backgroundImage: `linear-gradient(to right bottom, rgba(var(--color-secondary-dark-rgb), 0.5), rgba(var(--color-tertiary-dark-rgb), 0.5)), url(${tour.imageUrl})`,
+              clipPath: "polygon(0 0, 100% 0, 100% 85%, 0 100%)",
+            }}
+          />
+
+          {/* Header sobre la imagen */}
+          <h4 className="card__heading absolute top-28 right-2 w-3/4 text-right text-white uppercase font-light text-xl">
+            <span
+              className="box-decoration-break-clone px-1 py-1 rounded-md text-white"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right bottom, rgba(var(--color-primary-light-rgb), 0.9), rgba(var(--color-primary-dark-rgb), 0.9))",
+              }}
+            >
+              {tour.name}
+            </span>
+          </h4>
+        </div>
+
         <div className="p-4">
-          <h2 className="font-bold text-lg">{tour.name}</h2>
-          <p className="text-sm mb-2">{tour.short_description}</p>
-          <p className="text-xl font-bold mb-4">${tour.price}</p>
+          <ul className="p-6 space-y-2 divide-y divide-gray-200 text-center">
+            <li className="pt-2 first:pt-0">{tour.duration} hr tour</li>
+            <li className="pt-2">Up to 8 people</li>
+            <li className="pt-2">Lunch included</li>
+            <li className="pt-2">Boat + Captain + Guide</li>
+            <li className="pt-2">Suitable for {tour.difficulty}</li>
+          </ul>
           <ButtonText
             href={`/booking/${tour.slug}`}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700"
+            className="bg-[var(--color-secondary-dark)] text-[var(--color-grey-dark-3)]"
           >
             Book now
           </ButtonText>
@@ -24,7 +47,7 @@ export default function FlipCard({ tour }) {
       </div>
 
       {/* ✅ DESKTOP: Flip Card */}
-      <div className="hidden md:block relative h-96 [perspective:150rem]">
+      <div className="hidden md:block text-center relative h-[80vh] [perspective:150rem]">
         {/* Card Inner */}
         <div
           className="
@@ -36,19 +59,42 @@ export default function FlipCard({ tour }) {
           {/* Front Side */}
           <div
             className="
-              absolute top-0 left-0 w-full h-full
-              rounded-xl overflow-hidden shadow-xl bg-white
-              [backface-visibility:hidden]
-            "
+    absolute top-0 left-0 w-full h-full
+    rounded-xl overflow-hidden shadow-xl bg-white
+    [backface-visibility:hidden]
+  "
           >
-            <img
-              src={tour.imageUrl}
-              alt={tour.name}
-              className="w-full h-2/3 object-cover object-center"
-            />
-            <div className="p-4 bg-white h-1/3">
-              <h2 className="font-bold text-lg">{tour.name}</h2>
-              <p className="text-sm">{tour.short_description}</p>
+            <div className="relative h-[13rem] w-full overflow-hidden">
+              {/* Imagen con degradado y clip-path */}
+              <div
+                className="h-full w-full bg-cover bg-center"
+                style={{
+                  backgroundImage: `linear-gradient(to right bottom, rgba(var(--color-secondary-dark-rgb), 0.5), rgba(var(--color-tertiary-dark-rgb), 0.5)), url(${tour.imageUrl})`,
+                }}
+              />
+
+              {/* Header sobre la imagen */}
+              <h4 className="card__heading absolute top-28 right-2 w-3/4 text-right text-white uppercase font-light text-2xl">
+                <span
+                  className="box-decoration-break-clone px-1 py-1 rounded-md text-white"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to right bottom, rgba(var(--color-primary-light-rgb), 0.9), rgba(var(--color-primary-dark-rgb), 0.9))",
+                  }}
+                >
+                  {tour.name}
+                </span>
+              </h4>
+            </div>
+
+            <div className="p-4 bg-white">
+              <ul className="p-6 space-y-2 divide-y divide-gray-200">
+                <li className="pt-2 first:pt-0">{tour.duration} hr tour</li>
+                <li className="pt-2">Up to 8 people</li>
+                <li className="pt-2">Lunch included</li>
+                <li className="pt-2">Boat + Captain + Guide</li>
+                <li className="pt-2">Suitable for {tour.difficulty}</li>
+              </ul>
             </div>
           </div>
 
@@ -57,7 +103,7 @@ export default function FlipCard({ tour }) {
             className="
               absolute top-0 left-0 w-full h-full
               rounded-xl overflow-hidden shadow-xl
-              bg-gradient-to-br from-blue-400 to-blue-700 text-white
+              bg-gradient-to-br from-[var(--color-secondary-dark)] to-[var(--color-tertiary-dark)] text-white
               flex flex-col items-center justify-center
               text-center
               [backface-visibility:hidden]
@@ -67,7 +113,7 @@ export default function FlipCard({ tour }) {
             <p className="text-3xl font-bold mb-2">${tour.price}</p>
             <ButtonText
               href={`/booking/${tour.slug}`}
-              className="bg-white text-blue-800 px-4 py-2 rounded-lg font-semibold hover:bg-blue-100"
+              className="bg-[var(--color-secondary-dark)] text-[var(--color-grey-dark-3)] "
             >
               Book now
             </ButtonText>
