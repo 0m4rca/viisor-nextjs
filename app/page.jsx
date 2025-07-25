@@ -11,8 +11,8 @@ export default function HomePage() {
         <HeadingSecondary>Explore our tours</HeadingSecondary>
         <TourList />
       </main>
-      <footer className="bg-primary text-white p-6 text-center">
-        © 2025 Omar's Diving Adventures
+      <footer className="bg-grey-dark-3 text-white p-6 text-center">
+        © 2025 VIISOR DIVING
       </footer>
     </div>
   );

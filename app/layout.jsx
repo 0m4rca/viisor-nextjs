@@ -63,12 +63,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`md:px-6 md:py-6 lg:px-10 lg:py-10 ${montserrat.variable} font-sans bg-secondary text-tertiary`}
+        className={`md:px-6 md:py-6 lg:px-10 lg:py-10 ${montserrat.variable}  font-sans bg-secondary text-tertiary`}
       >
         <div className="relative">
           <Navigation />
         </div>
-        <main>{children}</main>
+        <main className="bg-[var(--color-secondary-dark)]">{children}</main>
       </body>
     </html>
   );

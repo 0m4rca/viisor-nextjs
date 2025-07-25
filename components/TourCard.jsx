@@ -1,8 +1,9 @@
 import ButtonText from "./ButtonText";
+import TourDetails from "./TourDetails";
 
 export default function FlipCard({ tour }) {
   return (
-    <div className="relative w-80 mx-auto group">
+    <div className="relative w-96 p-4 mx-auto group">
       {/* ✅ MOBILE: Show as a static simple card */}
       <div className="block md:hidden rounded-xl overflow-hidden shadow-xl bg-white text-center">
         <div className="relative h-48 w-full overflow-hidden">
@@ -29,16 +30,10 @@ export default function FlipCard({ tour }) {
         </div>
 
         <div className="p-4">
-          <ul className="p-6 space-y-2 divide-y divide-gray-200 text-center">
-            <li className="pt-2 first:pt-0">{tour.duration} hr tour</li>
-            <li className="pt-2">Up to 8 people</li>
-            <li className="pt-2">Lunch included</li>
-            <li className="pt-2">Boat + Captain + Guide</li>
-            <li className="pt-2">Suitable for {tour.difficulty}</li>
-          </ul>
+          <TourDetails tour={tour} />
           <ButtonText
             href={`/booking/${tour.slug}`}
-            className="bg-[var(--color-secondary-dark)] text-[var(--color-grey-dark-3)]"
+            className="bg-[var(--color-primary-light)] text-[var(--color-grey-dark-3)]"
           >
             Book now
           </ButtonText>
@@ -46,7 +41,7 @@ export default function FlipCard({ tour }) {
       </div>
 
       {/* ✅ DESKTOP: Flip Card */}
-      <div className="hidden md:block text-center relative h-[80vh] [perspective:150rem]">
+      <div className="hidden md:block text-center relative h-[90vh] [perspective:150rem]">
         {/* Card Inner */}
         <div
           className="
@@ -57,10 +52,7 @@ export default function FlipCard({ tour }) {
         >
           {/* Front Side */}
           <div
-            className="
-    absolute top-0 left-0 w-full h-full
-    rounded-xl overflow-hidden shadow-xl bg-white
-    [backface-visibility:hidden]
+            className="absolute top-0 left-0 w-full h-full rounded-xl overflow-hidden shadow-xl bg-white [backface-visibility:hidden]
   "
           >
             <div className="relative h-[13rem] w-full overflow-hidden">
@@ -87,13 +79,7 @@ export default function FlipCard({ tour }) {
             </div>
 
             <div className="p-4 bg-white">
-              <ul className="p-6 space-y-2 divide-y divide-gray-200">
-                <li className="pt-2 first:pt-0">{tour.duration} hr tour</li>
-                <li className="pt-2">Up to 8 people</li>
-                <li className="pt-2">Lunch included</li>
-                <li className="pt-2">Boat + Captain + Guide</li>
-                <li className="pt-2">Suitable for {tour.difficulty}</li>
-              </ul>
+              <TourDetails tour={tour} />
             </div>
           </div>
 

@@ -12,7 +12,7 @@
 
   /* Secondary Colors */
   --color-secondary-light: #f1faf5;
-  --color-secondary-dark: #f1faf5; /* Same as light unless you want a darker version */
+  --color-secondary-dark: #f5f8f7; /* Same as light unless you want a darker version */
 
   /* Tertiary Colors */
   --color-tertiary-light: #145c58;
