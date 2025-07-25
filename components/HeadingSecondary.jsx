@@ -16,7 +16,7 @@ export default function HeadingSecondary({ children }) {
     duration-300
     ease-in-out
     md:text-4xl
-    py-4
+    py-8
       "
     >
       {children}

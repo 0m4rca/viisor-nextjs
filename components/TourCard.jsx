@@ -11,7 +11,6 @@ export default function FlipCard({ tour }) {
             className="h-full w-full bg-cover bg-center"
             style={{
               backgroundImage: `linear-gradient(to right bottom, rgba(var(--color-secondary-dark-rgb), 0.5), rgba(var(--color-tertiary-dark-rgb), 0.5)), url(${tour.imageUrl})`,
-              clipPath: "polygon(0 0, 100% 0, 100% 85%, 0 100%)",
             }}
           />
 
