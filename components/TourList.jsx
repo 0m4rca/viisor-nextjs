@@ -10,14 +10,11 @@ export default function TourList() {
 
   useEffect(() => {
     async function fetchTours() {
-      const { data, error } = await supabase
-        .from("tours") // 👈 make sure this matches your table name
-        .select("*"); // You can also specify: 'id, name, description, price, image_url'
+      const { data, error } = await supabase.from("tours").select("*");
 
       if (error) {
         console.error("Error fetching tours:", error.message);
       } else {
-        // If your DB column is image_url, and your component expects imageUrl:
         const formatted = data.map((tour) => ({
           ...tour,
           imageUrl: tour.image_url,
