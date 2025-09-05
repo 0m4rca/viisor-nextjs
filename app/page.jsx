@@ -8,7 +8,7 @@ export default function HomePage() {
     <div>
       <Header />
       <main>
-        <HeadingSecondary>Explore our tours</HeadingSecondary>
+        <HeadingSecondary>Explore all our tours</HeadingSecondary>
         <TourList />
       </main>
       <footer className="bg-grey-dark-3 text-white p-6 text-center">
