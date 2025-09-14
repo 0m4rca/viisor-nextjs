@@ -1,17 +1,19 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
-import Image from "next/image";
 import {
-  MapPin,
   Clock,
   Users,
+  MapPin,
   Star,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useState } from "react";
+import DateSelector from "./DateSelector";
+import GuestForm from "./GuestForm";
 
 export default function BookingPageClient({ tour }) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -23,19 +25,21 @@ export default function BookingPageClient({ tour }) {
     },
   });
 
-  if (!tour?.images?.length) {
-    return <p>No hay imágenes disponibles</p>;
-  }
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showGuestForm, setShowGuestForm] = useState(false);
+
+  if (!tour) return <p>Tour no encontrado</p>;
 
   return (
-    <div className="max-w-5xl  mx-auto mb-10 py-32 px-4">
+    <div className="max-w-5xl mx-auto mb-10 py-32 px-4">
       {/* 🔹 Hero Carousel */}
-      <div className="relative">
+      <div className="relative mb-8">
         <div
           ref={sliderRef}
           className="keen-slider rounded-2xl w-full overflow-hidden shadow-lg"
         >
-          {tour.images.map((img, i) => (
+          {tour.images?.map((img, i) => (
             <div
               key={i}
               className="keen-slider__slide relative h-[400px] md:h-[550px]"
@@ -44,23 +48,24 @@ export default function BookingPageClient({ tour }) {
                 src={img}
                 alt={tour.name}
                 fill
-                className="object-cover"
+                className="object-cover rounded-2xl"
                 priority={i === 0}
               />
             </div>
           ))}
         </div>
 
+        {/* 🔹 Botones de navegación */}
         {slider && (
           <>
             <button
-              className="absolute top-1/2 left-2 -translate-y-1/2 ..."
+              className="absolute top-1/2 left-2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow"
               onClick={() => slider.current?.prev()}
             >
               <ChevronLeft className="w-6 h-6 text-gray-700" />
             </button>
             <button
-              className="absolute top-1/2 right-2 -translate-y-1/2 ..."
+              className="absolute top-1/2 right-2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow"
               onClick={() => slider.current?.next()}
             >
               <ChevronRight className="w-6 h-6 text-gray-700" />
@@ -127,55 +132,38 @@ export default function BookingPageClient({ tour }) {
         </div>
       )}
 
-      {/* 🔹 Inclusions / Exclusions */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {tour.included?.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-3 text-tertiary">Included</h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-2">
-              {tour.included.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {tour.not_included?.length > 0 && (
-          <div>
-            <h2 className="text-xl font-bold mb-3 text-tertiary">
-              Not included
-            </h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-2">
-              {tour.not_included.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </div>
+      {/* 🔹 Book Now */}
+      <div className="flex justify-center mb-8">
+        {!showCalendar && (
+          <button
+            onClick={() => setShowCalendar(true)}
+            className="bg-primary text-white font-semibold px-8 py-4 rounded-xl hover:bg-opacity-90 transition"
+          >
+            Book Now
+          </button>
         )}
       </div>
 
-      {/* 🔹 Reviews */}
-      {tour.reviews?.length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-xl font-bold mb-3 text-tertiary">
-            Customer Reviews
-          </h2>
-          <div className="space-y-4">
-            {tour.reviews.map((review, i) => (
-              <div key={i} className="bg-gray-50 p-4 rounded-xl shadow-sm">
-                <p className="text-gray-700 italic">"{review.comment}"</p>
-                <p className="mt-2 font-semibold">- {review.name}</p>
-              </div>
-            ))}
-          </div>
+      {/* 🔹 Calendar */}
+      {showCalendar && (
+        <div className="mb-8">
+          <DateSelector
+            tourId={tour.id}
+            selectedDate={selectedDate}
+            setSelectedDate={(dateId) => {
+              setSelectedDate(dateId);
+              setShowGuestForm(true);
+            }}
+          />
         </div>
       )}
 
-      {/* 🔹 CTA */}
-      <div className="flex justify-center">
-        <button className="bg-primary text-white font-semibold px-8 py-4 rounded-xl hover:bg-opacity-90 transition">
-          Book Now
-        </button>
-      </div>
+      {/* 🔹 Guest Form */}
+      {showGuestForm && selectedDate && (
+        <div className="mb-8">
+          <GuestForm tour={tour} selectedDate={selectedDate} />
+        </div>
+      )}
     </div>
   );
 }
