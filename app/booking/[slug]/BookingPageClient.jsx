@@ -29,7 +29,7 @@ export default function BookingPageClient({ tour }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showGuestForm, setShowGuestForm] = useState(false);
 
-  if (!tour) return <p>Tour no encontrado</p>;
+  if (!tour) return <p>Tour not found</p>;
 
   return (
     <div className="max-w-5xl mx-auto mb-10 py-32 px-4">
@@ -126,7 +126,10 @@ export default function BookingPageClient({ tour }) {
           <h2 className="text-xl font-bold mb-3 text-tertiary">Itinerary</h2>
           <ul className="list-disc list-inside text-gray-700 space-y-2">
             {tour.itinerary.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i}>
+                <span className="font-semibold">{step.time}</span> –{" "}
+                {step.activity}
+              </li>
             ))}
           </ul>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/SupabaseAuthClient";
 import { useState, useEffect } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -9,20 +10,30 @@ export default function DateSelector({
   selectedDate,
   setSelectedDate,
 }) {
-  const [availableDates, setAvailableDates] = useState([]);
+  const [availableDates, setAvailableDates] = useState(null);
 
-  // Por ahora, ejemplo de fechas disponibles, luego conectamos Supabase
   useEffect(() => {
-    const exampleDates = [
-      new Date("2025-09-20"),
-      new Date("2025-09-22"),
-      new Date("2025-09-25"),
-      new Date("2025-10-02"),
-      new Date("2025-10-08"),
-      new Date("2025-10-15"),
-    ];
-    setAvailableDates(exampleDates);
-  }, []);
+    const fetchDates = async () => {
+      const { data, error } = await SupabaseAuthClient.from("tour_dates")
+        .select("date")
+        .eq("tour_id", tourId);
+
+      if (error) {
+        console.error("Error fetching dates:", error);
+        return;
+      }
+
+      if (data.length === 0) {
+        // 👉 No hay fechas en la BD: todas futuras son posibles
+        setAvailableDates(null);
+      } else {
+        const parsedDates = data.map((d) => new Date(d.date));
+        setAvailableDates(parsedDates);
+      }
+    };
+
+    fetchDates();
+  }, [tourId]);
 
   return (
     <div>
@@ -31,9 +42,13 @@ export default function DateSelector({
         mode="single"
         selected={selectedDate}
         onSelect={setSelectedDate}
-        disabled={{ before: new Date(), outside: availableDates }}
+        disabled={
+          availableDates
+            ? { before: new Date(), outside: availableDates }
+            : { before: new Date() } // 👈 solo bloquea días pasados si no hay fechas
+        }
         modifiers={{
-          available: availableDates,
+          available: availableDates || [],
         }}
         modifiersClassNames={{
           available: "bg-blue-500 text-white rounded",
@@ -41,7 +56,12 @@ export default function DateSelector({
       />
       {selectedDate && (
         <p className="mt-2">
-          Fecha seleccionada: {selectedDate.toLocaleDateString("es-MX")}
+          Selected date:{" "}
+          {selectedDate.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "long", // 👈 full month name
+            year: "numeric",
+          })}
         </p>
       )}
     </div>

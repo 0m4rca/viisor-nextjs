@@ -24,11 +24,11 @@ export default function GuestForm({ tour, selectedDate }) {
       className="flex flex-col gap-4 bg-gray-50 p-6 rounded-xl shadow-md"
       onSubmit={handleSubmit}
     >
-      <h2 className="text-xl font-bold mb-4">Tus datos</h2>
+      <h2 className="text-xl font-bold mb-4">Your information</h2>
 
       <input
         type="text"
-        placeholder="Nombre completo"
+        placeholder="Full name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         className="px-4 py-2 border rounded-lg"
@@ -37,7 +37,7 @@ export default function GuestForm({ tour, selectedDate }) {
 
       <input
         type="email"
-        placeholder="Correo electrónico"
+        placeholder="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         className="px-4 py-2 border rounded-lg"
@@ -46,7 +46,7 @@ export default function GuestForm({ tour, selectedDate }) {
 
       <input
         type="tel"
-        placeholder="Teléfono"
+        placeholder="phone number"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         className="px-4 py-2 border rounded-lg"
@@ -57,7 +57,7 @@ export default function GuestForm({ tour, selectedDate }) {
         type="submit"
         className="bg-primary text-white font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition"
       >
-        Continuar
+        Continue
       </button>
     </form>
   );
