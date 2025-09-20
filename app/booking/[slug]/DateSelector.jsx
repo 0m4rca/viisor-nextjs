@@ -9,52 +9,126 @@ export default function DateSelector({
   tourId,
   selectedDate,
   setSelectedDate,
+  maxCapacity,
 }) {
-  const [tourDates, setTourDates] = useState([]); // guardamos {id, date}
+  const [tourDates, setTourDates] = useState([]); // [{ date, totalBooked, isFull }]
+
+  const parseDateOnly = (value) => {
+    if (!value) return null;
+    if (value instanceof Date)
+      return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+    const m = String(value).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    const dt = new Date(value);
+    if (isNaN(dt)) return null;
+    return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+  };
 
   useEffect(() => {
-    const fetchDates = async () => {
-      const { data, error } = await supabase
-        .from("tour_dates")
-        .select("id, date")
-        .eq("tour_id", tourId);
+    const fetchData = async () => {
+      try {
+        console.log("Fetching tour_dates for tourId:", tourId);
 
-      if (error) {
-        console.error("Error fetching dates:", error);
-        return;
-      }
+        const { data: datesData, error: datesError } = await supabase
+          .from("tour_dates")
+          .select("id, date")
+          .eq("tour_id", tourId);
 
-      if (!data || data.length === 0) {
-        // No hay fechas en BD: permitimos cualquier fecha futura
-        setTourDates([]);
-      } else {
-        const parsedDates = data
-          .map((d) => {
-            const dateObj = new Date(d.date);
-            if (isNaN(dateObj)) return null; // ignoramos fechas inválidas
-            return { id: d.id, date: dateObj };
-          })
-          .filter(Boolean);
+        if (datesError) throw datesError;
+        if (!datesData || datesData.length === 0) {
+          console.log("No tour dates found.");
+          setTourDates([]);
+          return;
+        }
+
+        const tourDateIds = datesData.map((d) => d.id);
+
+        const { data: bookingsData, error: bookingsError } = await supabase
+          .from("bookings")
+          .select("tour_date_id, num_people")
+          .in("tour_date_id", tourDateIds);
+
+        if (bookingsError) throw bookingsError;
+
+        console.log("Fetched bookingsData:", bookingsData);
+
+        // Agrupar reservas por fecha
+        const bookingsPerDate = {};
+        datesData.forEach((d) => {
+          const dateObj = parseDateOnly(d.date);
+          if (!dateObj) return;
+          const key = dateObj.toDateString();
+
+          const totalBookedForThisDate = bookingsData
+            .filter((b) => b.tour_date_id === d.id)
+            .reduce((sum, b) => sum + (b.num_people || 0), 0);
+
+          bookingsPerDate[key] =
+            (bookingsPerDate[key] || 0) + totalBookedForThisDate;
+        });
+
+        console.log("Bookings summed per date:", bookingsPerDate);
+
+        // Construir tourDates con isFull
+        const parsedDates = Object.entries(bookingsPerDate).map(
+          ([dateStr, totalBooked]) => {
+            const dateObj = new Date(dateStr);
+            const isFull = totalBooked >= maxCapacity;
+            console.log(
+              `Date ${dateStr} - totalBooked: ${totalBooked}, isFull: ${isFull}`
+            );
+            return { date: dateObj, totalBooked, isFull };
+          }
+        );
+
         setTourDates(parsedDates);
+      } catch (error) {
+        console.error("Error fetching tour dates or bookings:", error);
       }
     };
 
-    fetchDates();
-  }, [tourId]);
+    fetchData();
+  }, [tourId, maxCapacity]);
 
-  // Solo fechas para DayPicker
-  const availableDates = tourDates.map((d) => d.date);
+  // Fechas llenas y disponibles
+  const fullDates = tourDates.filter((d) => d.isFull).map((d) => d.date);
+  const availableDates = tourDates.filter((d) => !d.isFull).map((d) => d.date);
+
+  console.log("Available dates:", availableDates);
+  console.log("Full dates:", fullDates);
+
+  // Función para deshabilitar solo fechas llenas
+  const disabledDates = (date) => {
+    return fullDates.some(
+      (d) =>
+        d.getTime() ===
+        new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+    );
+  };
 
   const handleSelect = (date) => {
+    console.log("User clicked date:", date);
     if (!date) return;
 
-    // Buscamos la fecha en tourDates
     const selected = tourDates.find(
       (d) => d.date.toDateString() === date.toDateString()
     );
 
-    // Si no existe, devolvemos un objeto con id null
-    setSelectedDate(selected || { id: null, date });
+    console.log("Selected date object:", selected);
+
+    if (selected) {
+      if (selected.isFull) {
+        alert(
+          `Sorry — this date (${selected.date.toLocaleDateString()}) is full (${
+            selected.totalBooked
+          }/${maxCapacity}).`
+        );
+        return;
+      }
+      setSelectedDate({ id: null, date: selected.date }); // Aquí no tenemos id por tour_date_id porque agrupamos
+    } else {
+      setSelectedDate({ id: null, date });
+    }
   };
 
   return (
@@ -62,15 +136,17 @@ export default function DateSelector({
       <h2 className="text-xl font-bold mb-4">Choose a date</h2>
       <DayPicker
         mode="single"
-        selected={selectedDate?.date || null}
+        selected={selectedDate?.date}
         onSelect={handleSelect}
-        disabled={
-          availableDates.length > 0
-            ? { before: new Date(), outside: availableDates }
-            : { before: new Date() }
-        }
-        modifiers={{ available: availableDates }}
-        modifiersClassNames={{ available: "bg-blue-500 text-white rounded" }}
+        disabled={disabledDates}
+        modifiers={{
+          available: availableDates,
+          full: fullDates,
+        }}
+        modifiersClassNames={{
+          available: "bg-blue-500 text-white rounded",
+          full: "bg-red-400 text-gray-200 rounded line-through cursor-not-allowed",
+        }}
       />
       {selectedDate?.date && (
         <p className="mt-2">

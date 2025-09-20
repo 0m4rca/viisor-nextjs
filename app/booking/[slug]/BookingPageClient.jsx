@@ -157,6 +157,7 @@ export default function BookingPageClient({ tour }) {
               setSelectedDate(dateId);
               setShowGuestForm(true);
             }}
+            maxCapacity={tour.max_capacity}
           />
         </div>
       )}
