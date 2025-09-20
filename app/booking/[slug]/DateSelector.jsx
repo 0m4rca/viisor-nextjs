@@ -97,13 +97,22 @@ export default function DateSelector({
   console.log("Available dates:", availableDates);
   console.log("Full dates:", fullDates);
 
-  // Función para deshabilitar solo fechas llenas
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Función para deshabilitar fechas llenas y fechas pasadas
   const disabledDates = (date) => {
-    return fullDates.some(
-      (d) =>
-        d.getTime() ===
-        new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime()
+    const dateOnly = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
     );
+
+    // Deshabilitar fechas pasadas
+    if (dateOnly < today) return true;
+
+    // Deshabilitar fechas llenas
+    return fullDates.some((d) => d.getTime() === dateOnly.getTime());
   };
 
   const handleSelect = (date) => {
@@ -125,7 +134,7 @@ export default function DateSelector({
         );
         return;
       }
-      setSelectedDate({ id: null, date: selected.date }); // Aquí no tenemos id por tour_date_id porque agrupamos
+      setSelectedDate({ id: null, date: selected.date });
     } else {
       setSelectedDate({ id: null, date });
     }
