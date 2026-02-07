@@ -1,4 +1,4 @@
-import Logo from "./Logo";
+import Logo from "../common/Logo";
 import HamburgerBtn from "./HamburgerBtn";
 
 export default function Navigation() {

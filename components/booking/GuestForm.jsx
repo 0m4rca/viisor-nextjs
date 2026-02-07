@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { supabase } from "../../../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function GuestForm({ tour, selectedDate }) {
   // Cliente principal
@@ -67,7 +67,7 @@ export default function GuestForm({ tour, selectedDate }) {
             : new Date(selectedDate.date);
         if (isNaN(dateObj)) throw new Error("Selected date is not valid");
 
-        const dateString = dateObj.toISOString().split("T")[0]; // YYYY-MM-DD
+        const dateString = dateObj.toISOString().split("T")[0];
 
         const { data: newDate, error: dateError } = await supabase
           .from("tour_dates")

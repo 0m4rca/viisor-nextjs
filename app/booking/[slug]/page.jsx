@@ -1,9 +1,10 @@
-import { supabase } from "../../../lib/supabaseClient";
 import BookingPageClient from "./BookingPageClient";
+import { supabase } from "../../../lib/supabaseClient";
 
 export default async function Page({ params }) {
-  const { slug } = await params;
+  const { slug } = params;
 
+  // traer tour por slug
   const { data: tour, error } = await supabase
     .from("tours")
     .select("*")
@@ -11,11 +12,7 @@ export default async function Page({ params }) {
     .single();
 
   if (error || !tour) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-center text-lg text-red-600">Tour not found</p>
-      </div>
-    );
+    return <p>Tour not found</p>;
   }
 
   return <BookingPageClient tour={tour} />;

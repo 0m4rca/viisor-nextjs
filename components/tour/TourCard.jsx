@@ -1,4 +1,4 @@
-import ButtonText from "./ButtonText";
+import ButtonText from "../common/ButtonText";
 import TourDetails from "./TourDetails";
 
 export default function FlipCard({ tour }) {

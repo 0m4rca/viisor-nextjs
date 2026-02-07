@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
-import HeadingPrimary from "./HeadingPrimary";
-import ButtonText from "./ButtonText";
+import HeadingPrimary from "../common/HeadingPrimary";
+import ButtonText from "../common/ButtonText";
 
 export default function Header() {
   const [open, setOpen] = useState(false);

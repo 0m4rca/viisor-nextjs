@@ -1,6 +1,6 @@
-import TourList from "../components/TourList";
-import Header from "../components/Header";
-import HeadingSecondary from "../components/HeadingSecondary";
+import TourList from "../components/tour/TourList";
+import Header from "../components/layout/Header";
+import HeadingSecondary from "../components/common/HeadingSecondary";
 import "../styles/globals.css";
 
 export default function HomePage() {
