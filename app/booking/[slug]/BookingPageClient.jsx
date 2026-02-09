@@ -32,7 +32,7 @@ export default function BookingPageClient({ slug }) {
     fetchTour();
   }, [slug]);
 
-  if (!tour) return <p>Cargando...</p>;
+  if (!tour) return <p>Loading...</p>;
 
   return (
     <div className="max-w-5xl mx-auto mb-10 py-32 px-4">
