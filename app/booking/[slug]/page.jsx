@@ -1,5 +1,7 @@
 import BookingPageClient from "./BookingPageClient";
 
-export default function Page({ params }) {
-  return <BookingPageClient slug={params.slug} />;
+export default async function Page({ params }) {
+  const { slug } = await params;
+
+  return <BookingPageClient slug={slug} />;
 }
