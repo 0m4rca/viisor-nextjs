@@ -1,20 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "../../../lib/supabaseClient";
+
 import BookingHero from "../../../components/booking/BookingHero";
 import TourInfo from "../../../components/booking/TourInfo";
 import BookingFlow from "../../../components/booking/BookingFlow";
 
-export default function BookingPageClient({ tour }) {
-  if (!tour) return <p>Tour not found</p>;
+export default function BookingPageClient({ slug }) {
+  const [tour, setTour] = useState(null);
 
-  // Hooks para flujo de booking
   const [selectedDate, setSelectedDate] = useState(null);
   const [guests, setGuests] = useState(1);
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
   });
+
+  // 🔥 traer tour en cliente (correcto para supabase js)
+  useEffect(() => {
+    async function fetchTour() {
+      const { data } = await supabase
+        .from("tours")
+        .select("*")
+        .eq("slug", slug)
+        .single();
+
+      setTour(data);
+    }
+
+    fetchTour();
+  }, [slug]);
+
+  if (!tour) return <p>Cargando...</p>;
 
   return (
     <div className="max-w-5xl mx-auto mb-10 py-32 px-4">
