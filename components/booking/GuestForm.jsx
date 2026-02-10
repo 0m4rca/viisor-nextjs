@@ -1,3 +1,4 @@
+//GuestForm.jsx//
 "use client";
 
 import { useState } from "react";
@@ -50,15 +51,7 @@ export default function GuestForm({ tour, selectedDate }) {
       body: JSON.stringify({
         tour,
         selectedDate,
-        customer: {
-          name,
-          email,
-          phone,
-          finSize,
-          bcdSize,
-          wetsuitSize,
-          certification,
-        },
+        customer: { name, email, phone },
         companions,
       }),
     });
@@ -68,7 +61,9 @@ export default function GuestForm({ tour, selectedDate }) {
     if (data.url) {
       window.location.href = data.url;
     } else {
-      alert("Error creando pago");
+      console.log(data);
+      alert(data.error || "Error creando pago");
+
       setLoading(false);
     }
   };
