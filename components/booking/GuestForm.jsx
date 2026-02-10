@@ -6,11 +6,12 @@ import { useState } from "react";
 export default function GuestForm({ tour, selectedDate }) {
   const [loading, setLoading] = useState(false);
 
-  // Cliente principal
+  // cliente principal
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
+  // tallas
   const [finSize, setFinSize] = useState("");
   const [bcdSize, setBcdSize] = useState("");
   const [wetsuitSize, setWetsuitSize] = useState("");
@@ -32,15 +33,11 @@ export default function GuestForm({ tour, selectedDate }) {
     ]);
   };
 
-  const handleCompanionChange = (index, field, value) => {
+  const handleCompanionChange = (i, field, value) => {
     const updated = [...companions];
-    updated[index][field] = value;
+    updated[i][field] = value;
     setCompanions(updated);
   };
-
-  /* =========================
-     🔥 SOLO STRIPE
-  ========================== */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,10 +45,19 @@ export default function GuestForm({ tour, selectedDate }) {
 
     const res = await fetch("/api/create-checkout-session", {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         tour,
         selectedDate,
-        customer: { name, email, phone },
+        customer: {
+          name,
+          email,
+          phone,
+          finSize,
+          bcdSize,
+          wetsuitSize,
+          certification,
+        },
         companions,
       }),
     });
@@ -61,9 +67,7 @@ export default function GuestForm({ tour, selectedDate }) {
     if (data.url) {
       window.location.href = data.url;
     } else {
-      console.log(data);
       alert(data.error || "Error creando pago");
-
       setLoading(false);
     }
   };
@@ -82,7 +86,6 @@ export default function GuestForm({ tour, selectedDate }) {
         required
         className="border p-2 rounded"
       />
-
       <input
         placeholder="Email"
         type="email"
@@ -91,12 +94,45 @@ export default function GuestForm({ tour, selectedDate }) {
         required
         className="border p-2 rounded"
       />
-
       <input
         placeholder="Teléfono"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
         required
+        className="border p-2 rounded"
+      />
+
+      <h3 className="font-semibold mt-4">Tallas / Equipo</h3>
+
+      <input
+        placeholder="Fin size"
+        value={finSize}
+        onChange={(e) => setFinSize(e.target.value)}
+        required
+        className="border p-2 rounded"
+      />
+
+      {tour.type === "SCUBA" && (
+        <input
+          placeholder="BCD size"
+          value={bcdSize}
+          onChange={(e) => setBcdSize(e.target.value)}
+          required
+          className="border p-2 rounded"
+        />
+      )}
+
+      <input
+        placeholder="Wetsuit size"
+        value={wetsuitSize}
+        onChange={(e) => setWetsuitSize(e.target.value)}
+        required
+        className="border p-2 rounded"
+      />
+      <input
+        placeholder="Certificación"
+        value={certification}
+        onChange={(e) => setCertification(e.target.value)}
         className="border p-2 rounded"
       />
 
@@ -109,13 +145,14 @@ export default function GuestForm({ tour, selectedDate }) {
       </button>
 
       {companions.map((c, i) => (
-        <input
-          key={i}
-          placeholder="Nombre acompañante"
-          value={c.name}
-          onChange={(e) => handleCompanionChange(i, "name", e.target.value)}
-          className="border p-2 rounded"
-        />
+        <div key={i} className="border p-3 rounded">
+          <input
+            placeholder="Nombre"
+            value={c.name}
+            onChange={(e) => handleCompanionChange(i, "name", e.target.value)}
+            className="border p-2 rounded w-full mb-2"
+          />
+        </div>
       ))}
 
       <button

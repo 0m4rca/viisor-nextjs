@@ -20,10 +20,7 @@ export async function POST(req) {
 
     await supabase
       .from("bookings")
-      .update({
-        deposit_paid: true,
-        status: "confirmed",
-      })
+      .update({ deposit_paid: true, status: "confirmed" })
       .eq("id", bookingId);
 
     await supabase.from("payments").insert([

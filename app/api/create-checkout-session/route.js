@@ -5,13 +5,10 @@ import { supabase } from "../../../lib/supabaseClient";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
-  const { tour, selectedDate, customer, companions } = await req.json();
-
   try {
-    /* =========================
-       1️⃣ guest
-    ========================== */
+    const { tour, selectedDate, customer, companions } = await req.json();
 
+    /* 1️⃣ guest */
     let guest;
 
     const { data: existing } = await supabase
@@ -33,10 +30,7 @@ export async function POST(req) {
       guest = data;
     }
 
-    /* =========================
-       2️⃣ tour_date
-    ========================== */
-
+    /* 2️⃣ tour_date */
     const dateString = new Date(selectedDate.date).toISOString().split("T")[0];
 
     const { data: tourDate } = await supabase
@@ -45,10 +39,7 @@ export async function POST(req) {
       .select()
       .single();
 
-    /* =========================
-       3️⃣ booking PENDING
-    ========================== */
-
+    /* 3️⃣ booking */
     const guestsCount = companions.length + 1;
     const totalPrice = tour.price * guestsCount;
     const deposit = totalPrice * 0.2;
@@ -62,43 +53,55 @@ export async function POST(req) {
           num_people: guestsCount,
           total_price: totalPrice,
           status: "pending",
-          deposit_paid: false,
         },
       ])
       .select()
       .single();
 
-    /* =========================
-       4️⃣ stripe
-    ========================== */
+    /* 4️⃣ booking_guests (🔥 AQUÍ SE GUARDAN TALLAS) */
+    await supabase.from("booking_guests").insert([
+      {
+        booking_id: booking.id,
+        guest_id: guest.id,
+        name: customer.name,
+        fin_size: customer.finSize,
+        bcd_size: customer.bcdSize,
+        wetsuit_size: customer.wetsuitSize,
+        certification: customer.certification,
+      },
+      ...companions.map((c) => ({
+        booking_id: booking.id,
+        name: c.name,
+      })),
+    ]);
 
+    /* 5️⃣ stripe */
     const origin = req.headers.get("origin");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       customer_email: customer.email,
-
       line_items: [
         {
           price_data: {
             currency: "mxn",
-            product_data: {
-              name: `${tour.name} - Depósito`,
-            },
+            product_data: { name: `${tour.name} - Depósito` },
             unit_amount: Math.round(deposit * 100),
           },
           quantity: 1,
         },
       ],
-
       success_url: `${origin}/success`,
       cancel_url: `${origin}/booking/${tour.slug}`,
-
-      // 🔥 SOLO ID
       metadata: {
-        booking_id: booking.id.toString(),
+        booking_id: booking.id,
       },
     });
+
+    await supabase
+      .from("bookings")
+      .update({ stripe_session_id: session.id })
+      .eq("id", booking.id);
 
     return Response.json({ url: session.url });
   } catch (err) {
