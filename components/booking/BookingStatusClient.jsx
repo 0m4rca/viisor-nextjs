@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function BookingStatusClient() {
   const params = useSearchParams();
+  const router = useRouter();
 
   const [bookingId, setBookingId] = useState("");
   const [email, setEmail] = useState("");
@@ -77,7 +79,7 @@ export default function BookingStatusClient() {
     });
 
     const data = await res.json();
-    window.location.href = data.url;
+    router.push(data.url);
   }
 
   return (

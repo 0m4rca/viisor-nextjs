@@ -1,5 +1,5 @@
 import { supabase } from "../../../lib/supabaseClient";
-export const dynamic = "force-dynamic";
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const bookingId = searchParams.get("bookingId");
