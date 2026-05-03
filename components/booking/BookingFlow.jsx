@@ -3,15 +3,7 @@
 import DateSelector from "./DateSelector";
 import GuestForm from "./GuestForm";
 
-export default function BookingFlow({
-  tour,
-  selectedDate,
-  setSelectedDate,
-  guests,
-  setGuests,
-  customer,
-  setCustomer,
-}) {
+export default function BookingFlow({ tour, selectedDate, setSelectedDate }) {
   return (
     <div className="space-y-8">
       {/* Selector de fecha */}

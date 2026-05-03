@@ -72,6 +72,10 @@ export async function POST(req) {
       ...companions.map((c) => ({
         booking_id: booking.id,
         name: c.name,
+        fin_size: c.finSize,
+        bcd_size: c.bcdSize,
+        wetsuit_size: c.wetsuitSize,
+        certification: c.certification,
       })),
     ]);
 
@@ -91,7 +95,7 @@ export async function POST(req) {
           quantity: 1,
         },
       ],
-      success_url: `${origin}/success`,
+      success_url: `${origin}/success?booking=${booking.id}&email=${customer.email}`,
       cancel_url: `${origin}/booking/${tour.slug}`,
       metadata: {
         booking_id: booking.id,
