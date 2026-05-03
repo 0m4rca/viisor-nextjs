@@ -99,6 +99,7 @@ export async function POST(req) {
       cancel_url: `${origin}/booking/${tour.slug}`,
       metadata: {
         booking_id: booking.id,
+        type: "deposit",
       },
     });
 

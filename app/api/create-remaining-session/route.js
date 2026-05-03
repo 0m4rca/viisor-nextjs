@@ -21,16 +21,29 @@ export async function POST(req) {
     return Response.json({ error: "Booking not found" }, { status: 404 });
   }
 
+  // 1.5. Obtener email del guest
+  const { data: guest } = await supabase
+    .from("guests")
+    .select("email")
+    .eq("id", booking.guest_id)
+    .single();
+
   // 2. payments
   const { data: payments } = await supabase
     .from("payments")
     .select("*")
     .eq("booking_id", bookingId);
 
-  const totalPaid = (payments || []).reduce((s, p) => s + p.amount, 0);
-  const remaining = booking.total_price - totalPaid;
+  const totalPaid = (payments || []).reduce((s, p) => s + Number(p.amount), 0);
+  const remaining = Number(booking.total_price) - totalPaid;
 
   if (remaining <= 0) {
+    // Si ya está pagado completamente, actualizar status y devolver error
+    await supabase
+      .from("bookings")
+      .update({ status: "fully paid" })
+      .eq("id", bookingId);
+
     return Response.json({ error: "Already fully paid" }, { status: 400 });
   }
 
@@ -39,7 +52,7 @@ export async function POST(req) {
   // 3. Stripe session (remaining)
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    customer_email: booking.email, // o desde guests si lo manejas así
+    customer_email: guest?.email,
     line_items: [
       {
         price_data: {
