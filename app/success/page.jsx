@@ -1,53 +1,10 @@
-"use client";
+export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import SuccessClient from './SuccessClient';
 
 export default function SuccessPage() {
-  const params = useSearchParams();
-  const bookingId = params.get("booking");
-  const email = params.get("email");
-
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  async function fetchData() {
-    if (!bookingId) return;
-
-    try {
-      const res = await fetch(
-        `/api/booking-status?bookingId=${bookingId}&email=${email || ""}`,
-      );
-
-      const json = await res.json();
-
-      if (res.ok) setData(json);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    if (!bookingId) return;
-    fetchData();
-  }, [bookingId]);
-
-  async function handlePayRemaining() {
-    const res = await fetch("/api/create-remaining-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookingId }),
-    });
-
-    const json = await res.json();
-    window.location.href = json.url;
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
+  return <SuccessClient />;
+}
         Cargando información...
       </div>
     );
