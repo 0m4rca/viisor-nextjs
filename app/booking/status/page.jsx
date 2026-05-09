@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import BookingStatusClient from "../../../components/booking/BookingStatusClient";
 
 export default function BookingStatusPage() {
