@@ -5,23 +5,33 @@ import { useSearchParams } from "next/navigation";
 
 export default function SuccessClient() {
   const params = useSearchParams();
+
   const bookingId = params.get("booking");
   const email = params.get("email");
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+
   async function fetchData() {
-    if (!bookingId) return;
+    if (!bookingId) {
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch(
         `/api/booking-status?bookingId=${bookingId}&email=${email || ""}`,
       );
 
+      if (!res.ok) {
+        throw new Error("Error fetching booking");
+      }
+
       const json = await res.json();
 
-      if (res.ok) setData(json);
+      setData(json);
     } catch (err) {
       console.error(err);
     } finally {
@@ -30,19 +40,30 @@ export default function SuccessClient() {
   }
 
   useEffect(() => {
-    if (!bookingId) return;
     fetchData();
   }, [bookingId]);
 
   async function handlePayRemaining() {
-    const res = await fetch("/api/create-remaining-session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ bookingId }),
-    });
+    try {
+      const res = await fetch("/api/create-remaining-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bookingId }),
+      });
 
-    const json = await res.json();
-    window.location.href = json.url;
+      if (!res.ok) {
+        throw new Error("Error creating payment session");
+      }
+
+      const json = await res.json();
+
+      window.location.href = json.url;
+    } catch (err) {
+      console.error(err);
+      alert("No se pudo iniciar el pago.");
+    }
   }
 
   if (loading) {
@@ -50,17 +71,18 @@ export default function SuccessClient() {
       <div className="min-h-screen flex items-center justify-center text-gray-600">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+
           <p>Cargando información...</p>
         </div>
       </div>
     );
   }
 
-  if (!data) {
+  if (!data?.booking) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
+      <div className="min-h-screen flex items-center justify-center text-red-500">
         <div className="text-center">
-          <p>No se encontró información de la reserva.</p>
+          <p>No se encontró la reserva.</p>
         </div>
       </div>
     );
@@ -68,9 +90,13 @@ export default function SuccessClient() {
 
   const { booking, payments, totalPaid, remaining } = data;
 
+  const bookingLink = `${origin}/booking/status?bookingId=${
+    booking.id
+  }${email ? `&email=${email}` : ""}`;
+
   return (
-    <main className="max-w-2xl mx-auto py-20 px-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+    <main className="min-h-screen bg-gray-50 flex justify-center py-16 px-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-8 space-y-6">
         {/* Header */}
         <div className="text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -88,36 +114,31 @@ export default function SuccessClient() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            ¡Pago confirmado!
-          </h1>
-          <p className="text-gray-600">
-            Tu reserva ha sido confirmada exitosamente.
-          </p>
+
+          <h1 className="text-3xl font-bold text-green-600">✅ Pago exitoso</h1>
+
+          <p className="text-gray-500 mt-2">Tu reserva está registrada</p>
         </div>
 
-        {/* Booking Info */}
-        <div className="bg-gray-50 rounded-xl p-6 space-y-4">
-          <h2 className="font-semibold text-lg">Detalles de la reserva</h2>
+        {/* Info */}
+        <div className="grid gap-3 text-sm bg-gray-50 p-5 rounded-xl">
+          <p>
+            <strong>ID:</strong> {booking.id}
+          </p>
 
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <p className="text-gray-600">ID de reserva</p>
-              <p className="font-medium">{booking.id}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Estado</p>
-              <p className="font-medium capitalize">{booking.status}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Total</p>
-              <p className="font-medium">{booking.total_price} MXN</p>
-            </div>
-            <div>
-              <p className="text-gray-600">Pagado</p>
-              <p className="font-medium">{totalPaid} MXN</p>
-            </div>
-          </div>
+          <p>
+            <strong>Status:</strong> {booking.status}
+          </p>
+
+          <p>
+            <strong>Total:</strong> {booking.total_price} MXN
+          </p>
+
+          <p>
+            <strong>Pagado:</strong> {totalPaid} MXN
+          </p>
+
+          <p className="font-semibold text-black">Restante: {remaining} MXN</p>
         </div>
 
         {/* Payments */}
@@ -132,6 +153,7 @@ export default function SuccessClient() {
                   className="flex justify-between bg-gray-100 p-3 rounded-lg text-sm"
                 >
                   <span>{p.status}</span>
+
                   <span className="font-medium">{p.amount} MXN</span>
                 </div>
               ))
@@ -141,7 +163,7 @@ export default function SuccessClient() {
           </div>
         </div>
 
-        {/* Botón */}
+        {/* Remaining Payment */}
         {remaining > 0 && (
           <button
             onClick={handlePayRemaining}
@@ -158,9 +180,7 @@ export default function SuccessClient() {
           <input
             readOnly
             className="w-full border rounded-lg p-2 text-xs bg-gray-50"
-            value={`${window.location.origin}/booking/status?bookingId=${
-              booking.id
-            }${email ? `&email=${email}` : ""}`}
+            value={bookingLink}
           />
         </div>
       </div>
