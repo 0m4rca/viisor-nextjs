@@ -2,6 +2,98 @@
 
 import { useState } from "react";
 
+const WETSUIT_SIZES = ["S", "M", "L", "XL"];
+const CERTIFICATIONS = ["Open Water", "Advanced Open Water", "Rescue Diver"];
+const FIN_SIZE_OPTIONS = [
+  ...Array.from({ length: 11 }, (_, index) => `US ${index + 4}`),
+  ...Array.from({ length: 12 }, (_, index) => `EU ${index + 36}`),
+  ...Array.from({ length: 10 }, (_, index) => `MX ${index + 22}`),
+];
+
+function FinSizeSelect({ value, onChange, id }) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      Talla de aletas
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        required
+        className="w-full rounded border bg-white p-2"
+      >
+        <option value="">Selecciona talla</option>
+        {FIN_SIZE_OPTIONS.map((size) => (
+          <option key={size} value={size}>
+            {size}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function WetsuitSizeSelect({ value, onChange, id }) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      Talla de traje
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        required
+        className="w-full rounded border bg-white p-2"
+      >
+        <option value="">Selecciona talla</option>
+        {WETSUIT_SIZES.map((size) => (
+          <option key={size} value={size}>
+            {size}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function CertificationSelect({ value, onChange, id }) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      Certificación
+      <select
+        id={id}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-full rounded border bg-white p-2"
+      >
+        <option value="">Selecciona certificación</option>
+        {CERTIFICATIONS.map((certification) => (
+          <option key={certification} value={certification}>
+            {certification}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function DivesInput({ value, onChange, id }) {
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      Número de buceos
+      <input
+        id={id}
+        type="number"
+        min="0"
+        step="1"
+        inputMode="numeric"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        required
+        className="w-full rounded border p-2"
+      />
+    </label>
+  );
+}
+
 export default function GuestForm({ tour, selectedDate }) {
   const [loading, setLoading] = useState(false);
   const [paymentOption, setPaymentOption] = useState("deposit");
@@ -16,27 +108,46 @@ export default function GuestForm({ tour, selectedDate }) {
   const [bcdSize, setBcdSize] = useState("");
   const [wetsuitSize, setWetsuitSize] = useState("");
   const [certification, setCertification] = useState("");
+  const [numberOfDives, setNumberOfDives] = useState("0");
 
   // acompañantes
   const [companions, setCompanions] = useState([]);
 
-  const addCompanion = () => {
-    setCompanions([
-      ...companions,
-      {
-        name: "",
-        finSize: "",
-        bcdSize: "",
-        wetsuitSize: "",
-        certification: "",
-      },
-    ]);
+  const maxCompanions = Math.max(0, Number(tour.max_capacity || 1) - 1);
+
+  const createCompanion = () => ({
+    id: crypto.randomUUID(),
+    name: "",
+    finSize: "",
+    bcdSize: "",
+    wetsuitSize: "",
+    certification: "",
+    numberOfDives: "0",
+  });
+
+  const setCompanionCount = (count) => {
+    const nextCount = Math.min(maxCompanions, Math.max(0, count));
+    setCompanions((current) => {
+      if (nextCount <= current.length) return current.slice(0, nextCount);
+      return [
+        ...current,
+        ...Array.from({ length: nextCount - current.length }, createCompanion),
+      ];
+    });
   };
 
-  const handleCompanionChange = (i, field, value) => {
-    const updated = [...companions];
-    updated[i][field] = value;
-    setCompanions(updated);
+  const handleCompanionChange = (id, field, value) => {
+    setCompanions((current) =>
+      current.map((companion) =>
+        companion.id === id ? { ...companion, [field]: value } : companion,
+      ),
+    );
+  };
+
+  const removeCompanion = (id) => {
+    setCompanions((current) =>
+      current.filter((companion) => companion.id !== id),
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -57,6 +168,7 @@ export default function GuestForm({ tour, selectedDate }) {
           bcdSize,
           wetsuitSize,
           certification,
+          numberOfDives,
         },
         companions,
         paymentOption,
@@ -103,39 +215,40 @@ export default function GuestForm({ tour, selectedDate }) {
         className="border p-2 rounded"
       />
 
-      <h3 className="font-semibold mt-4">Tallas / Equipo</h3>
-
-      <input
-        placeholder="Fin size"
-        value={finSize}
-        onChange={(e) => setFinSize(e.target.value)}
-        required
-        className="border p-2 rounded"
-      />
-
-      {tour.type === "SCUBA" && (
-        <input
-          placeholder="BCD size"
-          value={bcdSize}
-          onChange={(e) => setBcdSize(e.target.value)}
-          required
-          className="border p-2 rounded"
+      <section className="space-y-3">
+        <h3 className="font-semibold mt-4">Tu equipo y experiencia</h3>
+        <FinSizeSelect
+          id="customer-fin-size"
+          value={finSize}
+          onChange={setFinSize}
         />
-      )}
-
-      <input
-        placeholder="Wetsuit size"
-        value={wetsuitSize}
-        onChange={(e) => setWetsuitSize(e.target.value)}
-        required
-        className="border p-2 rounded"
-      />
-      <input
-        placeholder="Certification"
-        value={certification}
-        onChange={(e) => setCertification(e.target.value)}
-        className="border p-2 rounded"
-      />
+        {tour.type === "SCUBA" && (
+          <label className="flex flex-col gap-1 text-sm">
+            Talla BCD
+            <input
+              value={bcdSize}
+              onChange={(event) => setBcdSize(event.target.value)}
+              required
+              className="w-full rounded border p-2"
+            />
+          </label>
+        )}
+        <WetsuitSizeSelect
+          id="customer-wetsuit-size"
+          value={wetsuitSize}
+          onChange={setWetsuitSize}
+        />
+        <CertificationSelect
+          id="customer-certification"
+          value={certification}
+          onChange={setCertification}
+        />
+        <DivesInput
+          id="customer-number-of-dives"
+          value={numberOfDives}
+          onChange={setNumberOfDives}
+        />
+      </section>
 
       <fieldset className="space-y-2">
         <legend className="font-semibold">Forma de pago</legend>
@@ -166,61 +279,120 @@ export default function GuestForm({ tour, selectedDate }) {
         </label>
       </fieldset>
 
-      <button
-        type="button"
-        onClick={addCompanion}
-        className="bg-gray-300 rounded p-2"
-      >
-        Add Companion
-      </button>
-
-      {companions.map((c, i) => (
-        <div key={i} className="border p-3 rounded">
-          <input
-            placeholder="Name"
-            value={c.name}
-            onChange={(e) => handleCompanionChange(i, "name", e.target.value)}
-            className="border p-2 rounded w-full mb-2"
-          />
-          <input
-            placeholder="Fin size"
-            value={c.finSize}
-            onChange={(e) =>
-              handleCompanionChange(i, "finSize", e.target.value)
-            }
-            className="border p-2 rounded w-full mb-2"
-          />
-
-          {tour.type === "SCUBA" && (
-            <input
-              placeholder="BCD size"
-              value={c.bcdSize}
-              onChange={(e) =>
-                handleCompanionChange(i, "bcdSize", e.target.value)
-              }
-              className="border p-2 rounded w-full mb-2"
-            />
-          )}
-
-          <input
-            placeholder="Wetsuit size"
-            value={c.wetsuitSize}
-            onChange={(e) =>
-              handleCompanionChange(i, "wetsuitSize", e.target.value)
-            }
-            className="border p-2 rounded w-full mb-2"
-          />
-
-          <input
-            placeholder="Certification"
-            value={c.certification}
-            onChange={(e) =>
-              handleCompanionChange(i, "certification", e.target.value)
-            }
-            className="border p-2 rounded w-full mb-2"
-          />
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h3 className="font-semibold">Acompañantes</h3>
+            <p className="text-sm text-gray-600">Máximo {maxCompanions}</p>
+          </div>
+          <div
+            className="flex items-center gap-3"
+            aria-label="Número de acompañantes"
+          >
+            <button
+              type="button"
+              onClick={() => setCompanionCount(companions.length - 1)}
+              disabled={companions.length === 0}
+              aria-label="Quitar un acompañante"
+              className="h-10 w-10 rounded border bg-white text-lg disabled:opacity-40"
+            >
+              −
+            </button>
+            <output className="min-w-6 text-center font-semibold">
+              {companions.length}
+            </output>
+            <button
+              type="button"
+              onClick={() => setCompanionCount(companions.length + 1)}
+              disabled={companions.length >= maxCompanions}
+              aria-label="Agregar un acompañante"
+              className="h-10 w-10 rounded border bg-white text-lg disabled:opacity-40"
+            >
+              +
+            </button>
+          </div>
         </div>
-      ))}
+
+        {companions.map((companion, index) => (
+          <fieldset
+            key={companion.id}
+            className="space-y-3 rounded-lg border bg-white p-4"
+          >
+            <div className="flex items-center justify-between">
+              <legend className="font-semibold">Acompañante {index + 1}</legend>
+              <button
+                type="button"
+                onClick={() => removeCompanion(companion.id)}
+                aria-label={`Quitar acompañante ${index + 1}`}
+                title="Quitar acompañante"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-xl text-gray-600 hover:bg-gray-100 hover:text-red-600"
+              >
+                ×
+              </button>
+            </div>
+            <label className="flex flex-col gap-1 text-sm">
+              Nombre
+              <input
+                value={companion.name}
+                onChange={(event) =>
+                  handleCompanionChange(
+                    companion.id,
+                    "name",
+                    event.target.value,
+                  )
+                }
+                required
+                className="w-full rounded border p-2"
+              />
+            </label>
+            <FinSizeSelect
+              id={`companion-${companion.id}-fin-size`}
+              value={companion.finSize}
+              onChange={(value) =>
+                handleCompanionChange(companion.id, "finSize", value)
+              }
+            />
+            {tour.type === "SCUBA" && (
+              <label className="flex flex-col gap-1 text-sm">
+                Talla BCD
+                <input
+                  value={companion.bcdSize}
+                  onChange={(event) =>
+                    handleCompanionChange(
+                      companion.id,
+                      "bcdSize",
+                      event.target.value,
+                    )
+                  }
+                  required
+                  className="w-full rounded border p-2"
+                />
+              </label>
+            )}
+            <WetsuitSizeSelect
+              id={`companion-${companion.id}-wetsuit-size`}
+              value={companion.wetsuitSize}
+              onChange={(value) =>
+                handleCompanionChange(companion.id, "wetsuitSize", value)
+              }
+            />
+            <CertificationSelect
+              id={`companion-${companion.id}-certification`}
+              value={companion.certification}
+              onChange={(value) =>
+                handleCompanionChange(companion.id, "certification", value)
+              }
+            />
+            <DivesInput
+              id={`companion-${companion.id}-number-of-dives`}
+              value={companion.numberOfDives}
+              onChange={(value) =>
+                handleCompanionChange(companion.id, "numberOfDives", value)
+              }
+            />
+          </fieldset>
+        ))}
+      </section>
 
       <button
         disabled={loading}

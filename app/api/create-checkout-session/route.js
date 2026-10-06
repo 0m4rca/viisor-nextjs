@@ -8,6 +8,31 @@ import {
 import { sendBookingStartedEmail } from "../../../lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const allowedWetsuitSizes = new Set(["S", "M", "L", "XL"]);
+const allowedCertifications = new Set([
+  "Open Water",
+  "Advanced Open Water",
+  "Rescue Diver",
+]);
+const allowedFinSizes = new Set([
+  ...Array.from({ length: 11 }, (_, index) => `US ${index + 4}`),
+  ...Array.from({ length: 12 }, (_, index) => `EU ${index + 36}`),
+  ...Array.from({ length: 10 }, (_, index) => `MX ${index + 22}`),
+]);
+
+function isValidDiver(person) {
+  const dives = Number(person.numberOfDives);
+  return (
+    typeof person.name === "string" &&
+    person.name.trim().length > 0 &&
+    allowedFinSizes.has(person.finSize) &&
+    allowedWetsuitSizes.has(person.wetsuitSize) &&
+    (!person.certification ||
+      allowedCertifications.has(person.certification)) &&
+    Number.isInteger(dives) &&
+    dives >= 0
+  );
+}
 
 export async function POST(req) {
   try {
@@ -30,6 +55,16 @@ export async function POST(req) {
     const selectedPaymentOption = paymentOption === "full" ? "full" : "deposit";
 
     const guestCompanions = Array.isArray(companions) ? companions : [];
+    const customerData = customer || {};
+    const divers = [customerData, ...guestCompanions];
+    if (divers.some((person) => !isValidDiver(person))) {
+      return Response.json(
+        {
+          error: "Revisa nombres, tallas, certificaciones y número de buceos.",
+        },
+        { status: 400 },
+      );
+    }
 
     const { data: tourData, error: tourError } = await supabase
       .from("tours")
@@ -67,6 +102,12 @@ export async function POST(req) {
     }
 
     const guestsCount = guestCompanions.length + 1;
+    if (guestsCount > Number(tourData.max_capacity)) {
+      return Response.json(
+        { error: "El grupo supera la capacidad máxima del tour." },
+        { status: 400 },
+      );
+    }
     const { data: existingBookings, error: bookingsError } = await supabase
       .from("bookings")
       .select("num_people, status")
@@ -146,6 +187,7 @@ export async function POST(req) {
           bcd_size: customer.bcdSize,
           wetsuit_size: customer.wetsuitSize,
           certification: customer.certification,
+          number_of_dives: Number(customer.numberOfDives),
         },
         ...guestCompanions.map((c) => ({
           booking_id: booking.id,
@@ -154,6 +196,7 @@ export async function POST(req) {
           bcd_size: c.bcdSize,
           wetsuit_size: c.wetsuitSize,
           certification: c.certification,
+          number_of_dives: Number(c.numberOfDives),
         })),
       ]);
 

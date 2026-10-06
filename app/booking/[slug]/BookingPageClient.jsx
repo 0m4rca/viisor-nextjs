@@ -35,19 +35,21 @@ export default function BookingPageClient({ slug }) {
   if (!tour) return <p>Loading...</p>;
 
   return (
-    <div className="max-w-5xl mx-auto mb-10 py-32 px-4">
+    <div className="mb-10">
       <BookingHero tour={tour} />
-      <TourInfo tour={tour} />
+      <div className="mx-auto max-w-5xl px-4">
+        <TourInfo tour={tour} />
 
-      <BookingFlow
-        tour={tour}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        guests={guests}
-        setGuests={setGuests}
-        customer={customer}
-        setCustomer={setCustomer}
-      />
+        <BookingFlow
+          tour={tour}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          guests={guests}
+          setGuests={setGuests}
+          customer={customer}
+          setCustomer={setCustomer}
+        />
+      </div>
     </div>
   );
 }
