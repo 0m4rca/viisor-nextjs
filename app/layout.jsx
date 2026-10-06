@@ -40,7 +40,7 @@ export const metadata = {
     siteName: "VIISOR Diving",
     images: [
       {
-        url: "/og-image.jpg", // Puedes poner un logo o una imagen del mar o de buzos.
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "VIISOR Diving Tours",

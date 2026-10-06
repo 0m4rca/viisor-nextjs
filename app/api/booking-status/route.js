@@ -1,74 +1,51 @@
 import { supabase } from "../../../lib/supabaseClient";
+import { hashBookingAccessToken } from "../../../lib/bookingAccess";
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const bookingId = searchParams.get("bookingId");
-  const email = searchParams.get("email");
+  const accessToken = searchParams.get("token");
 
-  if (!bookingId) {
-    return Response.json({ error: "Falta bookingId." }, { status: 400 });
+  if (!bookingId || !accessToken) {
+    return Response.json(
+      { error: "Se requiere el enlace privado de la reserva." },
+      { status: 400 },
+    );
   }
 
-  let booking;
+  const { data: booking, error: bookingError } = await supabase
+    .from("bookings")
+    .select(
+      "id, guest_id, tour_date_id, num_people, total_price, status, deposit_paid, created_at",
+    )
+    .eq("id", bookingId)
+    .eq("access_token_hash", hashBookingAccessToken(accessToken))
+    .single();
 
-  // 🟢 CASO 1: con email (usuario manual)
-  if (email) {
-    const { data: guest, error: guestError } = await supabase
-      .from("guests")
-      .select("id")
-      .eq("email", email)
-      .single();
-
-    if (guestError || !guest) {
-      return Response.json(
-        { error: "No se encontró un cliente con ese email." },
-        { status: 404 },
-      );
-    }
-
-    const { data: bookingData, error: bookingError } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("id", bookingId)
-      .eq("guest_id", guest.id)
-      .single();
-
-    if (bookingError || !bookingData) {
-      return Response.json(
-        { error: "No se encontró la reserva con ese ID para este email." },
-        { status: 404 },
-      );
-    }
-
-    booking = bookingData;
+  if (bookingError || !booking) {
+    return Response.json(
+      { error: "Enlace de reserva inválido." },
+      { status: 404 },
+    );
   }
 
-  // 🔵 CASO 2: sin email (Stripe / success page)
-  else {
-    const { data: bookingData, error: bookingError } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("id", bookingId)
-      .single();
-
-    if (bookingError || !bookingData) {
-      return Response.json(
-        { error: "No se encontró la reserva." },
-        { status: 404 },
-      );
-    }
-
-    booking = bookingData;
-  }
-
-  // 3️⃣ pagos
-  const { data: payments } = await supabase
+  const { data: payments, error: paymentsError } = await supabase
     .from("payments")
     .select("*")
     .eq("booking_id", bookingId);
 
-  const totalPaid = (payments || []).reduce((sum, p) => sum + p.amount, 0);
-  const remaining = booking.total_price - totalPaid;
+  if (paymentsError) {
+    return Response.json(
+      { error: "No se pudieron consultar los pagos." },
+      { status: 500 },
+    );
+  }
+
+  const totalPaid = (payments || []).reduce(
+    (sum, payment) => sum + Number(payment.amount),
+    0,
+  );
+  const remaining = Number(booking.total_price) - totalPaid;
 
   return Response.json({
     booking,

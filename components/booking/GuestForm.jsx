@@ -1,4 +1,3 @@
-//GuestForm.jsx//
 "use client";
 
 import { useState } from "react";
@@ -25,9 +24,9 @@ export default function GuestForm({ tour, selectedDate }) {
       ...companions,
       {
         name: "",
-        fin_size: "",
-        bcd_size: "",
-        wetsuit_size: "",
+        finSize: "",
+        bcdSize: "",
+        wetsuitSize: "",
         certification: "",
       },
     ]);
@@ -80,7 +79,7 @@ export default function GuestForm({ tour, selectedDate }) {
       <h2 className="font-bold text-lg">Información del cliente</h2>
 
       <input
-        placeholder="Nombre"
+        placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
@@ -130,7 +129,7 @@ export default function GuestForm({ tour, selectedDate }) {
         className="border p-2 rounded"
       />
       <input
-        placeholder="Certificación"
+        placeholder="Certification"
         value={certification}
         onChange={(e) => setCertification(e.target.value)}
         className="border p-2 rounded"
@@ -141,15 +140,52 @@ export default function GuestForm({ tour, selectedDate }) {
         onClick={addCompanion}
         className="bg-gray-300 rounded p-2"
       >
-        Añadir acompañante
+        Add Companion
       </button>
 
       {companions.map((c, i) => (
         <div key={i} className="border p-3 rounded">
           <input
-            placeholder="Nombre"
+            placeholder="Name"
             value={c.name}
             onChange={(e) => handleCompanionChange(i, "name", e.target.value)}
+            className="border p-2 rounded w-full mb-2"
+          />
+          <input
+            placeholder="Fin size"
+            value={c.finSize}
+            onChange={(e) =>
+              handleCompanionChange(i, "finSize", e.target.value)
+            }
+            className="border p-2 rounded w-full mb-2"
+          />
+
+          {tour.type === "SCUBA" && (
+            <input
+              placeholder="BCD size"
+              value={c.bcdSize}
+              onChange={(e) =>
+                handleCompanionChange(i, "bcdSize", e.target.value)
+              }
+              className="border p-2 rounded w-full mb-2"
+            />
+          )}
+
+          <input
+            placeholder="Wetsuit size"
+            value={c.wetsuitSize}
+            onChange={(e) =>
+              handleCompanionChange(i, "wetsuitSize", e.target.value)
+            }
+            className="border p-2 rounded w-full mb-2"
+          />
+
+          <input
+            placeholder="Certification"
+            value={c.certification}
+            onChange={(e) =>
+              handleCompanionChange(i, "certification", e.target.value)
+            }
             className="border p-2 rounded w-full mb-2"
           />
         </div>

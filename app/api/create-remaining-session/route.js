@@ -1,24 +1,31 @@
 import Stripe from "stripe";
 import { supabase } from "../../../lib/supabaseClient";
+import { hashBookingAccessToken } from "../../../lib/bookingAccess";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
-  const { bookingId } = await req.json();
+  const { bookingId, token } = await req.json();
 
-  if (!bookingId) {
-    return Response.json({ error: "Missing bookingId" }, { status: 400 });
+  if (!bookingId || !token) {
+    return Response.json(
+      { error: "Falta el enlace privado de la reserva." },
+      { status: 400 },
+    );
   }
 
-  // 1. booking
-  const { data: booking } = await supabase
+  const { data: booking, error: bookingError } = await supabase
     .from("bookings")
     .select("*")
     .eq("id", bookingId)
+    .eq("access_token_hash", hashBookingAccessToken(token))
     .single();
 
-  if (!booking) {
-    return Response.json({ error: "Booking not found" }, { status: 404 });
+  if (bookingError || !booking) {
+    return Response.json(
+      { error: "Enlace de reserva inválido." },
+      { status: 404 },
+    );
   }
 
   // 1.5. Obtener email del guest
@@ -48,6 +55,12 @@ export async function POST(req) {
   }
 
   const origin = req.headers.get("origin");
+  const successUrl = new URL("/success", origin);
+  successUrl.searchParams.set("booking", booking.id);
+  successUrl.searchParams.set("token", token);
+  const cancelUrl = new URL("/booking/status", origin);
+  cancelUrl.searchParams.set("bookingId", booking.id);
+  cancelUrl.searchParams.set("token", token);
 
   // 3. Stripe session (remaining)
   const session = await stripe.checkout.sessions.create({
@@ -65,8 +78,8 @@ export async function POST(req) {
         quantity: 1,
       },
     ],
-    success_url: `${origin}/success?booking=${booking.id}`,
-    cancel_url: `${origin}/booking/status?bookingId=${booking.id}`,
+    success_url: successUrl.toString(),
+    cancel_url: cancelUrl.toString(),
     metadata: {
       booking_id: booking.id,
       type: "remaining",

@@ -1,165 +1,120 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 export default function BookingStatusClient() {
   const params = useSearchParams();
   const router = useRouter();
+  const bookingId = params.get("bookingId") || params.get("booking");
+  const token = params.get("token");
 
-  const [bookingId, setBookingId] = useState("");
-  const [email, setEmail] = useState("");
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [autoMode, setAutoMode] = useState(false); // 👈 para ocultar form
+  const [loading, setLoading] = useState(true);
+  const [paying, setPaying] = useState(false);
 
-  // 🧠 1. Leer params de URL
   useEffect(() => {
-    const urlBookingId = params.get("bookingId") || params.get("booking");
-
-    const urlEmail = params.get("email");
-
-    if (urlBookingId) setBookingId(urlBookingId);
-    if (urlEmail) setEmail(urlEmail);
-
-    if (urlBookingId && urlEmail) {
-      setAutoMode(true); // 👈 viene de link directo
+    if (!bookingId || !token) {
+      setError(
+        "Abre el enlace privado que recibiste para consultar esta reserva.",
+      );
+      setLoading(false);
+      return;
     }
-  }, [params]);
 
-  // 🧠 2. Función para consultar
-  async function fetchBooking(id, mail) {
+    async function fetchBooking() {
+      try {
+        const query = new URLSearchParams({ bookingId, token });
+        const response = await fetch(`/api/booking-status?${query}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "No se pudo consultar la reserva.");
+        }
+
+        setResult(data);
+      } catch (fetchError) {
+        setError(fetchError.message || "Error de conexión.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBooking();
+  }, [bookingId, token]);
+
+  async function handlePayRemaining() {
+    setPaying(true);
     setError("");
-    setLoading(true);
 
     try {
-      const res = await fetch(
-        `/api/booking-status?bookingId=${encodeURIComponent(
-          id,
-        )}&email=${encodeURIComponent(mail)}`,
-      );
+      const response = await fetch("/api/create-remaining-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId, token }),
+      });
+      const data = await response.json();
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error || "Error al consultar la reserva");
-      } else {
-        setResult(data);
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo iniciar el pago.");
       }
-    } catch (err) {
-      setError("Error de conexión");
-    } finally {
-      setLoading(false);
+
+      router.push(data.url);
+    } catch (paymentError) {
+      setError(paymentError.message || "No se pudo iniciar el pago.");
+      setPaying(false);
     }
   }
 
-  // 🧠 3. Auto-submit si viene de URL
-  useEffect(() => {
-    if (bookingId && email) {
-      fetchBooking(bookingId, email);
-    }
-  }, [bookingId, email]);
-
-  // 🧠 4. Submit manual
-  function handleSubmit(e) {
-    e.preventDefault();
-    fetchBooking(bookingId, email);
-  }
-
-  // 🧠 5. Pagar restante
-  async function handlePayRemaining() {
-    const res = await fetch("/api/create-remaining-session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ bookingId }),
-    });
-
-    const data = await res.json();
-    router.push(data.url);
+  if (loading) {
+    return (
+      <p className="rounded-lg bg-white p-6 shadow">Cargando reserva...</p>
+    );
   }
 
   return (
-    <div className="space-y-6 bg-white p-6 rounded-2xl shadow">
-      {/* 🟢 FORM SOLO SI NO VIENE DE LINK */}
-      {!autoMode && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            placeholder="ID de reserva"
-            value={bookingId}
-            onChange={(e) => setBookingId(e.target.value)}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <button className="w-full bg-black text-white py-3 rounded-xl">
-            {loading ? "Consultando..." : "Ver estado"}
-          </button>
-        </form>
-      )}
-
-      {/* 🟡 loading */}
-      {loading && <p>⏳ Cargando información...</p>}
-
-      {/* 🔴 error */}
+    <div className="space-y-6 rounded-2xl bg-white p-6 shadow">
       {error && <p className="text-red-600">{error}</p>}
 
-      {/* 🟢 resultado */}
       {result && (
-        <div className="p-5 border rounded-xl bg-gray-50 space-y-3">
+        <div className="space-y-3 rounded-xl border bg-gray-50 p-5">
           <p>
             <strong>Reserva:</strong> {result.booking.id}
           </p>
-
           <p>
             <strong>Estado:</strong> {result.booking.status}
           </p>
-
           <p>
             <strong>Total:</strong> {result.booking.total_price} MXN
           </p>
-
           <p>
             <strong>Pagado:</strong> {result.totalPaid} MXN
           </p>
-
           <p>
             <strong>Saldo:</strong> {result.remaining} MXN
           </p>
-
           <hr />
-
           <p className="font-semibold">Pagos:</p>
 
           {result.payments.length > 0 ? (
-            result.payments.map((p) => (
-              <p key={p.id}>
-                {p.amount} MXN - {p.status}
+            result.payments.map((payment) => (
+              <p key={payment.id}>
+                {payment.amount} MXN - {payment.status}
               </p>
             ))
           ) : (
             <p>⏳ Confirmando pago...</p>
           )}
 
-          {/* 🔥 BOTÓN PAGO RESTANTE */}
           {result.remaining > 0 && (
             <button
               onClick={handlePayRemaining}
-              className="w-full mt-4 bg-green-600 text-white py-3 rounded-xl"
+              disabled={paying}
+              className="mt-4 w-full rounded-xl bg-green-600 py-3 text-white disabled:opacity-50"
             >
-              Pagar restante
+              {paying ? "Redirigiendo..." : "Pagar restante"}
             </button>
           )}
         </div>

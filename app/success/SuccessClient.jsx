@@ -7,7 +7,7 @@ export default function SuccessClient() {
   const params = useSearchParams();
 
   const bookingId = params.get("booking");
-  const email = params.get("email");
+  const token = params.get("token");
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,14 +15,14 @@ export default function SuccessClient() {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
 
   async function fetchData() {
-    if (!bookingId) {
+    if (!bookingId || !token) {
       setLoading(false);
       return;
     }
 
     try {
       const res = await fetch(
-        `/api/booking-status?bookingId=${bookingId}&email=${email || ""}`,
+        `/api/booking-status?bookingId=${encodeURIComponent(bookingId)}&token=${encodeURIComponent(token)}`,
       );
 
       if (!res.ok) {
@@ -41,7 +41,7 @@ export default function SuccessClient() {
 
   useEffect(() => {
     fetchData();
-  }, [bookingId]);
+  }, [bookingId, token]);
 
   async function handlePayRemaining() {
     try {
@@ -50,7 +50,7 @@ export default function SuccessClient() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ bookingId }),
+        body: JSON.stringify({ bookingId, token }),
       });
 
       if (!res.ok) {
@@ -90,9 +90,9 @@ export default function SuccessClient() {
 
   const { booking, payments, totalPaid, remaining } = data;
 
-  const bookingLink = `${origin}/booking/status?bookingId=${
-    booking.id
-  }${email ? `&email=${email}` : ""}`;
+  const bookingLink = `${origin}/booking/status?bookingId=${encodeURIComponent(
+    booking.id,
+  )}&token=${encodeURIComponent(token)}`;
 
   return (
     <main className="min-h-screen bg-gray-50 flex justify-center py-16 px-4">

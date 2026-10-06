@@ -17,9 +17,9 @@ export default function DateSelector({
   // ---------------------------
   // 1️⃣ Estado local
   // ---------------------------
-  // Guardamos todas las fechas del tour con info de reservas
+  // Guardamos las salidas publicadas del tour y su ocupación
   const [tourDates, setTourDates] = useState([]);
-  // tourDates = [{ date: Date, totalBooked: number, isFull: boolean }]
+  // tourDates = [{ id, date: Date, totalBooked, isFull }]
 
   // ---------------------------
   // 2️⃣ Función para limpiar hora
@@ -27,9 +27,9 @@ export default function DateSelector({
   // Solo queremos comparar fechas (día/mes/año)
   const parseDateOnly = (value) => {
     if (!value) return null;
-    const dt = new Date(value);
-    if (isNaN(dt)) return null;
-    return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    const [year, month, day] = value.split("-").map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(year, month - 1, day);
   };
 
   // ---------------------------
@@ -50,39 +50,40 @@ export default function DateSelector({
         const tourDateIds = datesData.map((d) => d.id);
 
         // ----- 3b. Traer reservas asociadas -----
-        const { data: bookingsData, error: bookingsError } = await supabase
-          .from("bookings")
-          .select("tour_date_id, num_people")
-          .in("tour_date_id", tourDateIds);
+        let bookingsData = [];
+        if (tourDateIds.length > 0) {
+          const { data, error: bookingsError } = await supabase
+            .from("bookings")
+            .select("tour_date_id, num_people")
+            .in("tour_date_id", tourDateIds)
+            .in("status", ["pending", "confirmed", "fully paid", "paid"]);
 
-        if (bookingsError) throw bookingsError;
+          if (bookingsError) throw bookingsError;
+          bookingsData = data || [];
+        }
 
-        // ----- 3c. Sumar reservas por fecha -----
-        const bookingsPerDate = {}; // { "Mon Feb 06 2026": totalBooked }
-        datesData.forEach((d) => {
-          const dateObj = parseDateOnly(d.date);
-          if (!dateObj) return;
+        const reservedByDateId = new Map();
+        for (const booking of bookingsData) {
+          const currentTotal = reservedByDateId.get(booking.tour_date_id) || 0;
+          reservedByDateId.set(
+            booking.tour_date_id,
+            currentTotal + Number(booking.num_people || 0),
+          );
+        }
 
-          const key = dateObj.toDateString(); // clave de fecha sin hora
-          const totalBookedForThisDate = bookingsData
-            .filter((b) => b.tour_date_id === d.id)
-            .reduce((sum, b) => sum + (b.num_people || 0), 0);
+        const parsedDates = datesData
+          .map((dateRow) => {
+            const date = parseDateOnly(dateRow.date);
+            const totalBooked = reservedByDateId.get(dateRow.id) || 0;
 
-          bookingsPerDate[key] =
-            (bookingsPerDate[key] || 0) + totalBookedForThisDate;
-        });
-
-        // ----- 3d. Construir tourDates con flag de isFull -----
-        const parsedDates = Object.entries(bookingsPerDate).map(
-          ([dateStr, totalBooked]) => {
-            const dateObj = new Date(dateStr);
             return {
-              date: dateObj,
+              id: dateRow.id,
+              date,
               totalBooked,
               isFull: totalBooked >= maxCapacity,
             };
-          },
-        );
+          })
+          .filter((dateRow) => dateRow.date);
 
         setTourDates(parsedDates);
       } catch (error) {
@@ -92,11 +93,6 @@ export default function DateSelector({
 
     fetchData();
   }, [tourId, maxCapacity]);
-
-  // ---------------------------
-  // 4️⃣ Fechas llenas
-  // ---------------------------
-  const fullDates = tourDates.filter((d) => d.isFull).map((d) => d.date);
 
   // ---------------------------
   // 5️⃣ Fecha actual
@@ -117,9 +113,14 @@ export default function DateSelector({
     // ❌ Deshabilitar fechas pasadas
     if (dateOnly < today) return true;
 
-    // ❌ Deshabilitar fechas llenas
-    return fullDates.some((d) => d.getTime() === dateOnly.getTime());
+    const scheduledDate = tourDates.find(
+      (item) => item.date.getTime() === dateOnly.getTime(),
+    );
+
+    return !scheduledDate || scheduledDate.isFull;
   };
+
+  const isAvailableDate = (date) => !disabledDates(date);
 
   // ---------------------------
   // 7️⃣ Manejar selección de fecha
@@ -129,11 +130,13 @@ export default function DateSelector({
 
     // Buscar info de la fecha seleccionada
     const selected = tourDates.find(
-      (d) => d.date.toDateString() === date.toDateString(),
+      (item) => item.date.getTime() === date.getTime(),
     );
 
+    if (!selected) return;
+
     // ❌ Si la fecha está llena, mostrar alerta
-    if (selected && selected.isFull) {
+    if (selected.isFull) {
       alert(
         `Lo sentimos, esta fecha está llena (${selected.totalBooked}/${maxCapacity})`,
       );
@@ -141,9 +144,7 @@ export default function DateSelector({
     }
 
     // ✅ Guardar fecha seleccionada
-    setSelectedDate(
-      selected ? { id: null, date: selected.date } : { id: null, date },
-    );
+    setSelectedDate({ id: selected.id, date: selected.date });
   };
 
   // ---------------------------
@@ -155,13 +156,17 @@ export default function DateSelector({
 
       {/* Calendario */}
       <DayPicker
+        className="booking-calendar"
         mode="single"
         selected={selectedDate?.date}
         onSelect={handleSelect}
         disabled={disabledDates}
+        modifiers={{ available: isAvailableDate }}
         modifiersClassNames={{
-          selected: "bg-primary text-white rounded",
-          disabled: "bg-gray-200 text-gray-500 line-through",
+          available: "booking-date-available",
+          selected: "booking-date-selected",
+          disabled: "booking-date-disabled",
+          today: "booking-date-today",
         }}
       />
 
