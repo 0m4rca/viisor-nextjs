@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
+import HeadingSecondary from "../common/HeadingSecondary";
 
 export default function BookingHero({ tour }) {
   const images =
@@ -78,7 +79,9 @@ export default function BookingHero({ tour }) {
       </section>
 
       <div className="mx-auto mb-6 max-w-5xl px-4 text-center">
-        <h1 className="mb-2 text-3xl font-bold text-tertiary">{tour.name}</h1>
+        <HeadingSecondary className="mb-2 text-3xl font-bold text-tertiary">
+          {tour.name}
+        </HeadingSecondary>
         <p className="text-2xl font-semibold text-primary">
           ${Number(tour.price).toLocaleString("es-MX")}
         </p>
