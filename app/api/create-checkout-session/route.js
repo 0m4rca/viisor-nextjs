@@ -5,12 +5,14 @@ import {
   createBookingAccessToken,
   hashBookingAccessToken,
 } from "../../../lib/bookingAccess";
+import { sendBookingStartedEmail } from "../../../lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const { tour, selectedDate, customer, companions } = await req.json();
+    const { tour, selectedDate, customer, companions, paymentOption } =
+      await req.json();
 
     if (!tour?.id || !selectedDate?.id || !customer?.email) {
       return Response.json(
@@ -18,6 +20,14 @@ export async function POST(req) {
         { status: 400 },
       );
     }
+
+    if (paymentOption && !["deposit", "full"].includes(paymentOption)) {
+      return Response.json(
+        { error: "Forma de pago no válida." },
+        { status: 400 },
+      );
+    }
+    const selectedPaymentOption = paymentOption === "full" ? "full" : "deposit";
 
     const guestCompanions = Array.isArray(companions) ? companions : [];
 
@@ -101,7 +111,8 @@ export async function POST(req) {
 
     /* 3️⃣ booking */
     const totalPrice = Number(tourData.price) * guestsCount;
-    const deposit = totalPrice * 0.2;
+    const amountToCharge =
+      selectedPaymentOption === "full" ? totalPrice : totalPrice * 0.2;
     const accessToken = createBookingAccessToken();
     const accessTokenHash = hashBookingAccessToken(accessToken);
 
@@ -149,10 +160,13 @@ export async function POST(req) {
     if (bookingGuestsError) throw bookingGuestsError;
 
     /* 5️⃣ stripe */
-    const origin = req.headers.get("origin");
-    const successUrl = new URL("/success", origin);
+    const siteUrl = process.env.APP_URL || req.headers.get("origin");
+    if (!siteUrl) throw new Error("Falta configurar APP_URL.");
+
+    const successUrl = new URL("/success", siteUrl);
     successUrl.searchParams.set("booking", booking.id);
     successUrl.searchParams.set("token", accessToken);
+    const cancelUrl = new URL(`/booking/${tourData.slug}`, siteUrl);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -161,26 +175,42 @@ export async function POST(req) {
         {
           price_data: {
             currency: "mxn",
-            product_data: { name: `${tourData.name} - Depósito` },
-            unit_amount: Math.round(deposit * 100),
+            product_data: {
+              name: `${tourData.name} - ${selectedPaymentOption === "full" ? "Pago total" : "Depósito"}`,
+            },
+            unit_amount: Math.round(amountToCharge * 100),
           },
           quantity: 1,
         },
       ],
       success_url: successUrl.toString(),
-      cancel_url: `${origin}/booking/${tourData.slug}`,
+      cancel_url: cancelUrl.toString(),
       metadata: {
         booking_id: booking.id,
-        type: "deposit",
+        type: selectedPaymentOption,
       },
     });
 
-    await supabase
+    const { error: sessionUpdateError } = await supabase
       .from("bookings")
       .update({ stripe_session_id: session.id })
       .eq("id", booking.id);
 
-    return Response.json({ url: session.url });
+    if (sessionUpdateError) throw sessionUpdateError;
+
+    const bookingUrl = new URL("/booking/status", siteUrl);
+    bookingUrl.searchParams.set("bookingId", booking.id);
+    bookingUrl.searchParams.set("token", accessToken);
+
+    const emailSent = await sendBookingStartedEmail({
+      to: customer.email,
+      customerName: customer.name,
+      tourName: tourData.name,
+      tourDate: tourDate.date,
+      bookingUrl: bookingUrl.toString(),
+    });
+
+    return Response.json({ url: session.url, emailSent });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }

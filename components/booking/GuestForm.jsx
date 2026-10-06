@@ -4,6 +4,7 @@ import { useState } from "react";
 
 export default function GuestForm({ tour, selectedDate }) {
   const [loading, setLoading] = useState(false);
+  const [paymentOption, setPaymentOption] = useState("deposit");
 
   // cliente principal
   const [name, setName] = useState("");
@@ -58,6 +59,7 @@ export default function GuestForm({ tour, selectedDate }) {
           certification,
         },
         companions,
+        paymentOption,
       }),
     });
 
@@ -135,6 +137,35 @@ export default function GuestForm({ tour, selectedDate }) {
         className="border p-2 rounded"
       />
 
+      <fieldset className="space-y-2">
+        <legend className="font-semibold">Forma de pago</legend>
+        <label className="flex cursor-pointer items-center gap-2 rounded border p-3">
+          <input
+            type="radio"
+            name="paymentOption"
+            value="deposit"
+            checked={paymentOption === "deposit"}
+            onChange={() => setPaymentOption("deposit")}
+          />
+          <span>
+            Pagar depósito (20%):{" "}
+            {Math.round(Number(tour.price) * (companions.length + 1) * 0.2)} MXN
+          </span>
+        </label>
+        <label className="flex cursor-pointer items-center gap-2 rounded border p-3">
+          <input
+            type="radio"
+            name="paymentOption"
+            value="full"
+            checked={paymentOption === "full"}
+            onChange={() => setPaymentOption("full")}
+          />
+          <span>
+            Pagar total: {Number(tour.price) * (companions.length + 1)} MXN
+          </span>
+        </label>
+      </fieldset>
+
       <button
         type="button"
         onClick={addCompanion}
@@ -195,7 +226,11 @@ export default function GuestForm({ tour, selectedDate }) {
         disabled={loading}
         className="bg-black text-white p-3 rounded-xl disabled:opacity-50"
       >
-        {loading ? "Redirigiendo..." : "Pagar depósito"}
+        {loading
+          ? "Redirigiendo..."
+          : paymentOption === "full"
+            ? "Pagar total"
+            : "Pagar depósito"}
       </button>
     </form>
   );

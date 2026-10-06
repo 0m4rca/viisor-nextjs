@@ -114,7 +114,11 @@ export default function BookingStatusClient() {
               disabled={paying}
               className="mt-4 w-full rounded-xl bg-green-600 py-3 text-white disabled:opacity-50"
             >
-              {paying ? "Redirigiendo..." : "Pagar restante"}
+              {paying
+                ? "Redirigiendo..."
+                : result.totalPaid > 0
+                  ? "Pagar saldo pendiente"
+                  : "Pagar total"}
             </button>
           )}
         </div>
